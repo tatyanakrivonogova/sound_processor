@@ -7,7 +7,7 @@
 #include "Thread.h"
 #include "inputThread.h"
 #include "outputThread.h"
-
+#include "muteConverter.h"
 
 int main() {
 
@@ -17,9 +17,13 @@ int main() {
 	inputThread1.input();
 
 	std::string outputFile = "new_Ring08.wav";
+	
+
+	muteConverter mute(thread, 1,  4);
+
+	thread = mute.convert();
 	outputThread outputThread1(outputFile, thread);
 	outputThread1.output();
-
 
 	return 0;
 }

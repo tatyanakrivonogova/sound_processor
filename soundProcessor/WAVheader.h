@@ -1,7 +1,7 @@
 #pragma once
 
 class WAVheader {
-public:
+private:
 	char chunk_ID[4];
 	unsigned int chunk_size;
 	char format[4];
@@ -21,4 +21,32 @@ public:
 
 	char subchunk3_ID[4];
 	unsigned int subchunk3_size;
+
+public:
+	WAVheader() {}
+	~WAVheader() {}
+
+	WAVheader(const WAVheader&);
+	WAVheader(WAVheader&&) noexcept;
+
+	WAVheader& operator=(const WAVheader&);
+	WAVheader& operator=(WAVheader&&) noexcept;
+
+	unsigned int& get_chunk_size();
+	unsigned int& get_subchunk1_size();
+	unsigned int& get_audio_format();
+	unsigned int& get_num_channels();
+	unsigned long& get_sample_rate();
+	unsigned long& get_byte_rate();
+	unsigned int& get_block_align();
+	unsigned int& get_bits_per_sample();
+	unsigned int& get_subchunk2_size();
+	unsigned int& get_subchunk3_size();
+
+	char* get_chunk_ID();
+	char* get_format();
+	char* get_subchunk1_ID();
+	char* get_subchunk2_ID();
+	char* get_subchunk2_data();
+	char* get_subchunk3_ID();
 };
