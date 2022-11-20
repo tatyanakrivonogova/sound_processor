@@ -13,10 +13,10 @@ unsigned int& WAVheader::get_audio_format() {
 unsigned int& WAVheader::get_num_channels() {
     return num_channels;
 }
-unsigned long& WAVheader::get_sample_rate() {
+unsigned int& WAVheader::get_sample_rate() {
     return sample_rate;
 }
-unsigned long& WAVheader::get_byte_rate() {
+unsigned int& WAVheader::get_byte_rate() {
     return byte_rate;
 }
 unsigned int& WAVheader::get_block_align() {

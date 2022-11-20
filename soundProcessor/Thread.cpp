@@ -2,11 +2,12 @@
 #include "WAVheader.h"
 #include <memory>
 
-Thread::Thread(const Thread& otherThread) : header(otherThread.header), data(otherThread.data) {}
+Thread::Thread(const Thread& otherThread) : header(otherThread.header), data(otherThread.data), source(otherThread.source){}
 
 Thread::Thread(Thread&& otherThread) noexcept {
     header = std::move(otherThread.header);
     data = std::move(otherThread.data);
+    source = otherThread.source;
 }
 
 Thread& Thread::operator=(const Thread& otherThread) {
@@ -15,6 +16,7 @@ Thread& Thread::operator=(const Thread& otherThread) {
 
     header = WAVheader(otherThread.header);
     data = otherThread.data;
+    source = otherThread.source;
     return *this;
 }
 
@@ -23,6 +25,7 @@ Thread& Thread::operator=(Thread&& otherThread) noexcept {
         return *this;
     header = std::move(otherThread.header);
     data = std::move(otherThread.data);
+    source = otherThread.source;
     return *this;
 }
 
@@ -30,11 +33,22 @@ WAVheader& Thread::getHeader() {
 	return header;
 }
 
-std::vector<char>& Thread::getData() {
+unsigned int Thread::getData() {
 	return data;
 }
 
-void Thread::setData(std::vector<char>& newData) {
+std::shared_ptr<std::string> Thread::getSource() {
+    return source;
+}
 
-    data.assign(newData.begin(), newData.end());
+void Thread::setData(unsigned int newData) {
+    data = newData;
+}
+
+void Thread::setHeader(WAVheader& newHeader) {
+    header = newHeader;
+}
+
+void Thread::setSource(std::shared_ptr<std::string> newSource) {
+    source = newSource;
 }

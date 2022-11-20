@@ -2,12 +2,13 @@
 #include "WAVheader.h"
 #include <memory>
 #include <vector>
+#include <string>
 
 class Thread
 {
 public:
-	Thread() {}
-	Thread(WAVheader header, std::vector<char> data) : header(header), data(data) {}
+	Thread(WAVheader header, unsigned int data = 0, std::shared_ptr<std::string> source = nullptr) : header(header), data(data) {}
+	Thread(std::shared_ptr<std::string> source = nullptr) : source(source) {}
 	~Thread() {}
 
 	Thread(const Thread&);
@@ -17,11 +18,15 @@ public:
 	Thread& operator=(Thread&&) noexcept;
 
 	WAVheader& getHeader();
-	std::vector<char>& getData();
-	void setData(std::vector<char>& newData);
+	unsigned int getData();
+	std::shared_ptr<std::string> getSource();
+	
+	void setHeader(WAVheader& newHeader);
+	void setData(unsigned int newData);
+	void setSource(std::shared_ptr<std::string> newSource);
 
 private:
 	WAVheader header;
-	//std::shared_ptr <char> data = nullptr;
-	std::vector<char> data;
+	unsigned int data = 0;
+	std::shared_ptr<std::string> source;
 };

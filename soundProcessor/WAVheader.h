@@ -10,8 +10,8 @@ private:
 	unsigned int subchunk1_size;
 	unsigned int audio_format;
 	unsigned int num_channels;
-	unsigned long sample_rate;
-	unsigned long byte_rate;
+	unsigned int sample_rate;
+	unsigned int byte_rate;
 	unsigned int block_align;
 	unsigned int bits_per_sample;
 
@@ -36,8 +36,8 @@ public:
 	unsigned int& get_subchunk1_size();
 	unsigned int& get_audio_format();
 	unsigned int& get_num_channels();
-	unsigned long& get_sample_rate();
-	unsigned long& get_byte_rate();
+	unsigned int& get_sample_rate();
+	unsigned int& get_byte_rate();
 	unsigned int& get_block_align();
 	unsigned int& get_bits_per_sample();
 	unsigned int& get_subchunk2_size();

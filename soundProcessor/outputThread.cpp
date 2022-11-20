@@ -1,6 +1,8 @@
 #include "outputThread.h"
 #include "WAVheader.h"
 #include "Thread.h"
+#include <iostream>
+#include <iosfwd>
 
 int outputThread::output() {
 	std::ofstream fout;
@@ -26,7 +28,7 @@ int outputThread::output() {
 	num_channels[1] = char((thread.getHeader().get_num_channels() >> 8) & 0xff);
 	fout.write((char*)num_channels, 2);
 
-
+	std::cout << " sample rate " << fout.tellp() << std::endl;
 	char sample_rate[4];
 	sample_rate[0] = char(thread.getHeader().get_sample_rate() & 0xff);
 	sample_rate[1] = char((thread.getHeader().get_sample_rate() >> 8) & 0xff);
@@ -34,15 +36,15 @@ int outputThread::output() {
 	sample_rate[3] = char((thread.getHeader().get_sample_rate() >> 24) & 0xff);
 	fout.write((char*)sample_rate, 4);
 
-
+	std::cout << " byte rate " << fout.tellp() << std::endl;
 	char byte_rate[4];
-	byte_rate[0] = char(thread.getHeader().get_byte_rate() & 0xff);
-	byte_rate[1] = char((thread.getHeader().get_byte_rate() >> 8) & 0xff);
-	byte_rate[2] = char((thread.getHeader().get_byte_rate() >> 16) & 0xff);
-	byte_rate[3] = char((thread.getHeader().get_byte_rate() >> 24) & 0xff);
+	byte_rate[0] = unsigned char(thread.getHeader().get_byte_rate() & 0xff);
+	byte_rate[1] = unsigned char((thread.getHeader().get_byte_rate() >> 8) & 0xff);
+	byte_rate[2] = unsigned char((thread.getHeader().get_byte_rate() >> 16) & 0xff);
+	byte_rate[3] = unsigned char((thread.getHeader().get_byte_rate() >> 24) & 0xff);
 	fout.write((char*)byte_rate, 4);
 
-
+	std::cout << " block align " << fout.tellp() << std::endl;
 	char block_align[2];
 	block_align[0] = char(thread.getHeader().get_block_align() & 0xff);
 	block_align[1] = char((thread.getHeader().get_block_align() >> 8) & 0xff);
@@ -54,14 +56,36 @@ int outputThread::output() {
 	bits_per_sample[1] = char((thread.getHeader().get_bits_per_sample() >> 8) & 0xff);
 	fout.write((char*)bits_per_sample, 2);
 
+	/*char subchunk2_ID[4];
+	unsigned int subchunk2_size;
+	char subchunk2_data[250];*/
+	/*fout.write((char*)thread.getHeader().get_subchunk2_ID(), 4);
+	fout.write((char*)(&thread.getHeader().get_subchunk2_size()), 4);
+	fout.write((char*)(thread.getHeader().get_subchunk2_data()), thread.getHeader().get_subchunk2_size());*/
+
 	fout.write((char*)thread.getHeader().get_subchunk3_ID(), 4);
 	fout.write((char*)(&thread.getHeader().get_subchunk3_size()), 4);
 
-	//char* data = new char[thread.getData().size()];
-	//fout.write((char*)thread.getData(), thread.getHeader().get_subchunk3_size());
-	for (auto x : thread.getData()) {
-		fout.write((char*)&x, 1);
+
+	std::ifstream fin;
+	fin.open(*thread.getSource(), std::ios::binary);
+	fin.seekg(1, std::ios::beg);
+	fin.ignore(thread.getData());
+	//short buffer[10000];
+	short* buffer = new short[1000];
+
+	for (unsigned int i = 0; i < thread.getHeader().get_subchunk3_size() / 2000; ++i) {
+		fin.read((char*)buffer, 2000);
+		fout.write((char*)buffer, 2000);
 	}
+
+
+	fin.read((char*)buffer, thread.getHeader().get_subchunk3_size() % 2000);
+	fout.write((char*)buffer, thread.getHeader().get_subchunk3_size() % 2000);
+
+
+	//fin.read((char*)buffer, 152);
+	//fout.write((char*)buffer, 152);
 
 	fout.close();
 	return 0;
