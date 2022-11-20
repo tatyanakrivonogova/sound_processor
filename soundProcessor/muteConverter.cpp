@@ -5,6 +5,8 @@
 
 Thread muteConverter::convert() {
 	//std::fstream source;
+	FILE* fin;
+	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
 	Thread newThread;
 
 	///*for (unsigned int i = time_begin*44100; i < (time_begin + duration)*44100; ++i) {
