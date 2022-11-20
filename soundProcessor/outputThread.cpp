@@ -3,6 +3,7 @@
 #include "Thread.h"
 #include <iostream>
 #include <iosfwd>
+#define BUF_SIZE 1000
 
 int outputThread::output() {
 	FILE* fout;
@@ -69,17 +70,18 @@ int outputThread::output() {
 	}
 
 	fseek(fin, thread.getData(), std::ios::beg);
-	short* buffer = new short[1000];
+	short* buffer = new short[BUF_SIZE];
 
-	for (unsigned int i = 0; i < thread.getHeader().get_subchunk3_size() / 1000; ++i) {
+	for (unsigned int i = 0; i < thread.getHeader().get_subchunk3_size() / BUF_SIZE; ++i) {
 
-		fread(buffer, 2, 1000, fin);
-		fwrite(buffer, 2, 1000, fout);
+		fread(buffer, 2, BUF_SIZE, fin);
+		fwrite(buffer, 2, BUF_SIZE, fout);
 	}
 
-	fread(buffer, 2, thread.getHeader().get_subchunk3_size() % 1000, fin);
-	fwrite(buffer, 2, thread.getHeader().get_subchunk3_size() % 1000, fout);
+	fread(buffer, 2, thread.getHeader().get_subchunk3_size() % BUF_SIZE, fin);
+	fwrite(buffer, 2, thread.getHeader().get_subchunk3_size() % BUF_SIZE, fout);
 
+	delete[] buffer;
 	fclose(fout);
 	fclose(fin);
 	return 0;

@@ -22,8 +22,10 @@ int inputThread::input() {
 	}
 	thread.setFile(std::make_shared<std::string>(inputFile));
 
-	char* buffer4 = new char[4];
-	char* buffer2 = new char[2];
+	/*char* buffer4 = new char[4];
+	char* buffer2 = new char[2];*/
+	char buffer2[2];
+	char buffer4[4];
 
 	fread(thread.getHeader().get_chunk_ID(), 1, 4, fin);
 	if (std::string(thread.getHeader().get_chunk_ID(), 4) != "RIFF") {
@@ -144,7 +146,7 @@ int inputThread::input() {
 	std::cout << "OK!" << std::endl;
 	std::cout << rest_bytes << std::endl;
 	fclose(fin);
-	delete [] buffer4;
-	delete [] buffer2;
+	//delete [] buffer4;
+	//delete [] buffer2;
 	return 0;
 }

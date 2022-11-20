@@ -144,6 +144,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="muteConverter.cpp" />
     <ClCompile Include="outputThread.cpp" />
+    <ClCompile Include="readConfig.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="WAVheader.cpp" />
   </ItemGroup>
@@ -153,6 +154,7 @@
     <ClInclude Include="inputThread.h" />
     <ClInclude Include="muteConverter.h" />
     <ClInclude Include="outputThread.h" />
+    <ClInclude Include="readConfig.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="WAVheader.h" />
   </ItemGroup>

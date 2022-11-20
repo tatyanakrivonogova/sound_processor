@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include <map>
 #include <stdexcept>
@@ -17,7 +16,7 @@ public:
     AbstractProduct* CreateObject(const IdentifierType& id) {
         typename AssocMap::const_iterator it = map_.find(id);
         if (it == map_.end()) {
-            throw std::runtime_error("Undefine ID");
+            throw std::runtime_error("Undefined ID");
         }
         return (it->second)();
     }
