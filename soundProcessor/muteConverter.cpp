@@ -1,26 +1,33 @@
 #include "muteConverter.h"
 #include "Converter.h"
 #include "Thread.h"
+#include "readBuffer.h"
+#include "writeBuffer.h"
 #include <fstream>
 #include <iostream>
-#define BUF_SIZE 1000
+#define BUFF_SIZE 1000
 
 
 Thread muteConverter::convert() {
 	FILE* fin;
 	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
 
+	fseek(fin, 0, SEEK_END);
+	std::cout << "fin: " << ftell(fin) << std::endl;
+	fseek(fin, 0, SEEK_SET);
+
+	readBuffer readBuff(BUFF_SIZE, fin, thread.getData());
+
 
 	Thread newThread(thread);
 	std::string newFile = "new_" + (*thread.getFile());
 	newThread.setFile(std::make_shared<std::string>(newFile));
 
-
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
 
 
-
+	//output header, create ceparate class
 	fwrite(thread.getHeader().get_chunk_ID(), 1, 4, fout);
 	fwrite(&thread.getHeader().get_chunk_size(), 4, 1, fout);
 	fwrite(thread.getHeader().get_format(), 1, 4, fout);
@@ -68,52 +75,68 @@ Thread muteConverter::convert() {
 	fwrite(thread.getHeader().get_subchunk3_ID(), 1, 4, fout);
 	fwrite(&thread.getHeader().get_subchunk3_size(), 4, 1, fout);
 
+	writeBuffer writeBuf(BUFF_SIZE, fout, thread.getData());
+	
 
-
-	fseek(fin, thread.getData(), std::ios::beg);
-
-
-	short* buffer = new short[BUF_SIZE];
-	size_t pos = 0;
+	//short* buffer = new short[BUFF_SIZE];
+	//size_t pos = 0;
 	size_t begin = time_begin * 44100;
 	size_t end = (time_begin + duration) * 44100;
-	size_t data_size = thread.getHeader().get_subchunk3_size();
+	//size_t data_size = thread.getHeader().get_subchunk3_size();
+	size_t data_size = thread.getHeader().get_chunk_size() - thread.getData();
+	std::cout << " size: " << thread.getHeader().get_chunk_size() << std::endl;
+	std::cout << " size3: " << thread.getHeader().get_subchunk3_size() << std::endl;
 
+
+	////before begin
+	//while (pos + BUFF_SIZE < begin) {
+	//	fread(buffer, 2, BUFF_SIZE, fin);
+	//	fwrite(buffer, 2, BUFF_SIZE, fout);
+	//	pos += BUFF_SIZE;
+	//}
+
+	//fread(buffer, 2, begin - pos, fin);
+	//fwrite(buffer, 2, begin - pos, fout);
+
+	//pos = begin;
+
+
+	////changing
+	//for (size_t i = 0; i < BUFF_SIZE; ++i) {
+	//	buffer[i] = 0;
+	//}
+	//while (pos + BUFF_SIZE < end) {
+	//	fwrite(buffer, 2, BUFF_SIZE, fout);
+	//	pos += BUFF_SIZE;
+	//}
+
+	//fwrite(buffer, 2, end - pos, fout);
+	//pos = end;
+
+	////after end
+	//while (pos + BUFF_SIZE < data_size) {
+	//	fread(buffer, 2, BUFF_SIZE, fin);
+	//	fwrite(buffer, 2, BUFF_SIZE, fout);
+	//	pos += BUFF_SIZE;
+	//}
+
+	//fread(buffer, 2, data_size - pos, fin);
+	//fwrite(buffer, 2, data_size - pos, fout);
 
 	//before begin
-	while (pos + BUF_SIZE < begin) {
-		fread(buffer, 2, BUF_SIZE, fin);
-		fwrite(buffer, 2, BUF_SIZE, fout);
-		pos += BUF_SIZE;
+	for (size_t i = 0; i < begin; ++i) {
+		writeBuf >> readBuff[i];
 	}
-
-	fread(buffer, 2, begin - pos, fin);
-	fwrite(buffer, 2, begin - pos, fout);
-
-	pos = begin;
-
 
 	//changing
-	for (size_t i = 0; i < BUF_SIZE; ++i) {
-		buffer[i] = 0;
+	for (size_t i = begin; i < end; ++i) {
+		writeBuf >> 0;
 	}
-	while (pos + BUF_SIZE < end) {
-		fwrite(buffer, 2, BUF_SIZE, fout);
-		pos += BUF_SIZE;
-	}
-
-	fwrite(buffer, 2, end - pos, fout);
-	pos = end;
 
 	//after end
-	while (pos + BUF_SIZE < data_size) {
-		fread(buffer, 2, BUF_SIZE, fin);
-		fwrite(buffer, 2, BUF_SIZE, fout);
-		pos += BUF_SIZE;
+	for (size_t i = end; i < data_size/2; ++i) {
+		writeBuf >> readBuff[i];
 	}
-
-	fread(buffer, 2, data_size - pos, fin);
-	fwrite(buffer, 2, data_size - pos, fout);
 
 	return newThread;
 }

@@ -139,24 +139,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Converter.cpp" />
     <ClCompile Include="inputThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="muteConverter.cpp" />
     <ClCompile Include="outputThread.cpp" />
+    <ClCompile Include="readBuffer.cpp" />
     <ClCompile Include="readConfig.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="WAVheader.cpp" />
+    <ClCompile Include="writeBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buffer.h" />
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="inputThread.h" />
     <ClInclude Include="muteConverter.h" />
     <ClInclude Include="outputThread.h" />
+    <ClInclude Include="readBuffer.h" />
     <ClInclude Include="readConfig.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="WAVheader.h" />
+    <ClInclude Include="writeBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

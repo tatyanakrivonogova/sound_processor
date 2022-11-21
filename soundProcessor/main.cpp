@@ -19,10 +19,6 @@ int main() {
 	inputThread inputThread1(inputFile, thread);
 	inputThread1.input();
 
-	
-
-	//muteConverter mute(thread, 1,  4);
-	//thread = mute.convert();
 
 	std::string configFile = "config.txt";
 	std::vector<std::vector<std::string> > config;
