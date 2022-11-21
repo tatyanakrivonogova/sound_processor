@@ -1,6 +1,7 @@
 #include "outputThread.h"
 #include "WAVheader.h"
 #include "Thread.h"
+#include "outputHeader.h"
 #include <iostream>
 #include <iosfwd>
 #define BUF_SIZE 1000
@@ -14,7 +15,10 @@ int outputThread::output() {
 		return -1;
 	}
 
-	fwrite(thread.getHeader().get_chunk_ID(), 1, 4, fout);
+	outputHeader outputHeader(fout, thread.getHeader());
+	outputHeader.output();
+
+	/*fwrite(thread.getHeader().get_chunk_ID(), 1, 4, fout);
 	fwrite(&thread.getHeader().get_chunk_size(), 4, 1, fout);
 	fwrite(thread.getHeader().get_format(), 1, 4, fout);
 
@@ -59,7 +63,7 @@ int outputThread::output() {
 	fwrite(buffer2, 1, 2, fout);
 
 	fwrite(thread.getHeader().get_subchunk3_ID(), 1, 4, fout);
-	fwrite(&thread.getHeader().get_subchunk3_size(), 4, 1, fout);
+	fwrite(&thread.getHeader().get_subchunk3_size(), 4, 1, fout);*/
 
 
 	FILE* fin;

@@ -6,8 +6,6 @@ Buffer::Buffer(size_t BUFF_SIZE, FILE* file, size_t begin_position) : BUFF_SIZE(
 	buff = new short[BUFF_SIZE];
 	
 	fseek(file, begin_position, SEEK_SET);
-	//std::cout << ftell(file) << std::endl;
-	fread(buff, sizeof(short), BUFF_SIZE, file);
 }
 
 Buffer::~Buffer() {

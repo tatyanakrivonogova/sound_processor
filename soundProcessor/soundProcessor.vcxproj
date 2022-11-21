@@ -144,6 +144,7 @@
     <ClCompile Include="inputThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="muteConverter.cpp" />
+    <ClCompile Include="outputHeader.cpp" />
     <ClCompile Include="outputThread.cpp" />
     <ClCompile Include="readBuffer.cpp" />
     <ClCompile Include="readConfig.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Factory.h" />
     <ClInclude Include="inputThread.h" />
     <ClInclude Include="muteConverter.h" />
+    <ClInclude Include="outputHeader.h" />
     <ClInclude Include="outputThread.h" />
     <ClInclude Include="readBuffer.h" />
     <ClInclude Include="readConfig.h" />
