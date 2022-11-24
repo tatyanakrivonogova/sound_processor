@@ -6,6 +6,7 @@
 #include "readBuffer.h"
 #include "writeBuffer.h"
 #include "outputHeader.h"
+#include "inputThread.h"
 #include <fstream>
 #include <iostream>
 #define BUFF_SIZE 1000
@@ -13,8 +14,8 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMixConverter(std::vector<Thread> threads, std::vector<unsigned int> time_args) {
-		return new mixConverter(threads, time_args);
+	Converter* createMixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> time_args) {
+		return new mixConverter(threadFiles, time_args);
 	}
 
 	const bool registered = ConverterFactory.Register("mix", createMixConverter);
@@ -22,6 +23,15 @@ namespace {
 
 
 Thread mixConverter::convert() {
+
+	Thread thread1(std::make_shared<std::string>(threadFile1));
+	inputThread inputThread1(threadFile1, thread1);
+	inputThread1.input();
+
+	Thread thread2(std::make_shared<std::string>(threadFile2));
+	inputThread inputThread2(threadFile2, thread2);
+	inputThread2.input();
+
 	FILE* fin1;
 	fopen_s(&fin1, (*thread1.getFile()).c_str(), "rb");
 

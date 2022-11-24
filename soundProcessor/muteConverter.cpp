@@ -6,14 +6,16 @@
 #include "readBuffer.h"
 #include "writeBuffer.h"
 #include "outputHeader.h"
+#include "inputThread.h"
 #include <fstream>
 #include <iostream>
+#include <string>
 #define BUFF_SIZE 1000
 
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMuteConverter(std::vector<Thread> threads, std::vector<unsigned int> time_args) {
+	Converter* createMuteConverter(std::vector<std::string> threads, std::vector<unsigned int> time_args) {
 		return new muteConverter(threads, time_args);
 	}
 	
@@ -22,6 +24,11 @@ namespace {
 
 
 Thread muteConverter::convert() {
+
+	Thread thread(std::make_shared<std::string>(threadFile));
+	inputThread inputThread1(threadFile, thread);
+	inputThread1.input();
+
 	FILE* fin;
 	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
 
