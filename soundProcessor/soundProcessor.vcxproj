@@ -143,6 +143,7 @@
     <ClCompile Include="Converter.cpp" />
     <ClCompile Include="inputThread.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mixConverter.cpp" />
     <ClCompile Include="muteConverter.cpp" />
     <ClCompile Include="outputHeader.cpp" />
     <ClCompile Include="outputThread.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="inputThread.h" />
+    <ClInclude Include="mixConverter.h" />
     <ClInclude Include="muteConverter.h" />
     <ClInclude Include="outputHeader.h" />
     <ClInclude Include="outputThread.h" />
