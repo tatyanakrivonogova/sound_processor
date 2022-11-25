@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="CmdArgumentHandler.cpp" />
     <ClCompile Include="Converter.cpp" />
     <ClCompile Include="inputThread.cpp" />
     <ClCompile Include="main.cpp" />
@@ -155,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="CmdArgumentHandler.h" />
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="inputThread.h" />
