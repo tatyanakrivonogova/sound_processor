@@ -28,7 +28,6 @@ size_t getNumberOfThreads(std::vector<std::string> command) {
 }
 
 
-
 int main(int argc, char** argv) {
 
 	std::string outputFile;
@@ -38,16 +37,14 @@ int main(int argc, char** argv) {
 
 	CmdArgumentHandler CmdArgumentHandler(outputFile, inputFiles, configFile, help);
 
-	if (CmdArgumentHandler.getCmdArgs(argc, argv, configFile, outputFile, inputFiles, help) == 1) {
-		std::cout << "BAD" << std::endl;
-		return -1;
+	try {
+		CmdArgumentHandler.getCmdArgs(argc, argv, configFile, outputFile, inputFiles, help);
+	}
+	catch (std::invalid_argument const& ex) {
+		std::cout << ex.what() << '\n';
+		return 0;
 	}
 
-	//std::string inputFile = "Ring08.wav";
-	//std::string inputFile = "funkorama.wav";
-
-
-	//std::string configFile = "config.txt";
 	std::vector<std::vector<std::string> > config;
 	readConfig readConfig(configFile);
 	readConfig.read(config);
@@ -63,12 +60,26 @@ int main(int argc, char** argv) {
 			threads.push_back(config[i][j]);
 		}
 
-		std::vector<unsigned int> time_args;
+		std::vector<unsigned int> parameters;
 		for (size_t j = threads_number+1; j < config[i].size(); ++j) { // miss name of converter and input threads
-			time_args.push_back(stoi(config[i][j]));
+			try {
+				parameters.push_back(stoi(config[i][j]));
+			}
+			catch (std::invalid_argument const& ex) {
+				std::cout << ex.what() << '\n';
+				return 0;
+			}
 		}
 
-		std::shared_ptr<Converter> current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, time_args));
+		std::shared_ptr<Converter> current_converter;
+		try {
+			current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, parameters));
+		}
+		catch (std::runtime_error const& ex) {
+			std::cout << ex.what() << '\n';
+			return 0;
+		}
+			
 		thread = current_converter->convert();
 	}
 

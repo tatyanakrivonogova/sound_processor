@@ -1,4 +1,5 @@
 #include "CmdArgumentHandler.h"
+#include <stdexcept>
 
 std::string CmdArgumentHandler::getCmdArgument(char** argv, size_t indexArgument) {
 	std::string arg = argv[indexArgument];
@@ -11,32 +12,28 @@ std::string CmdArgumentHandler::getCmdArgument(char** argv, size_t indexArgument
 	return arg;
 }
 
-bool CmdArgumentHandler::checkFileFormat(std::string& str, std::string expectedFormat) {
+void CmdArgumentHandler::checkFileFormat(std::string& str, std::string expectedFormat) {
 	std::string format;
 
 	std::string::iterator pos = find(str.begin(), str.end(), '.');
 	if (pos == str.end()) {
-		return 1;
+		throw std::invalid_argument("Wrong cmd argument");
 	}
 	++pos;
 	while (pos != str.end()) {
 		format += (*pos);
 		++pos;
 	}
-	if (format == expectedFormat) {
-		return 0;
-	}
-	else {
-		return 1;
+	if (format != expectedFormat) {
+		throw std::invalid_argument("Wrong file format");
 	}
 }
 
-int CmdArgumentHandler::getCmdArgs(int argc, char** argv, std::string& configFile, std::string& outputFile, std::vector<std::string>& inputFiles, bool& help) {
+void CmdArgumentHandler::getCmdArgs(int argc, char** argv, std::string& configFile, std::string& outputFile, std::vector<std::string>& inputFiles, bool& help) {
 	int indexArgument = 1;
 	bool output = false;
 
 	while (indexArgument < argc) {
-		//std::string argument = argv[currentArgument];
 		std::string currentArgument = getCmdArgument(argv, indexArgument);
 		++indexArgument;
 
@@ -45,18 +42,23 @@ int CmdArgumentHandler::getCmdArgs(int argc, char** argv, std::string& configFil
 		}
 		else if (currentArgument == "-c") {
 			if (indexArgument == argc) {
-				return 1; //throw exception
+				throw std::invalid_argument("More arguments were expected");
 			}
 			configFile = getCmdArgument(argv, indexArgument);
 			++indexArgument;
-			if (checkFileFormat(configFile, "txt") == 1) {
-				return 1;
+			try {
+				checkFileFormat(configFile, "txt");
+			}
+			catch (std::invalid_argument const& ex) {
+				throw ex;
 			}
 		}
 		else {
-			//std::string inputFile = getCmdArgument(argv, currentArgument);
-			if (checkFileFormat(currentArgument, "wav") == 1) {
-				return 1; //throw exception
+			try {
+				checkFileFormat(currentArgument, "wav");
+			}
+			catch (std::invalid_argument const& ex) {
+				throw ex;
 			}
 			if (output == false) {
 				outputFile = std::move(currentArgument);
@@ -67,5 +69,15 @@ int CmdArgumentHandler::getCmdArgs(int argc, char** argv, std::string& configFil
 			}
 		}
 	}
-	return 0;
+
+	if (outputFile.empty()) {
+		throw std::invalid_argument("No output file");
+	}
+	if (configFile.empty()) {
+		throw std::invalid_argument("No config file");
+	}
+	if (inputFiles.empty()) {
+		throw std::invalid_argument("No input file");
+	}
+
 }

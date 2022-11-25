@@ -15,12 +15,12 @@ public:
         return map_.erase(id) == 1;
     }
 
-    AbstractProduct* CreateObject(const IdentifierType& id, std::vector<std::string> threadFiles, std::vector<unsigned int> time_args) {
+    AbstractProduct* CreateObject(const IdentifierType& id, std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
         typename AssocMap::const_iterator it = map_.find(id);
         if (it == map_.end()) {
-            throw std::runtime_error("Undefined ID");
+            throw std::runtime_error("Undefined ID of converter");
         }
-        return (it->second)(threadFiles, time_args);
+        return (it->second)(threadFiles, parameters);
     }
 
 private:

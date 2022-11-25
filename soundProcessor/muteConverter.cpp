@@ -15,8 +15,8 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMuteConverter(std::vector<std::string> threads, std::vector<unsigned int> time_args) {
-		return new muteConverter(threads, time_args);
+	Converter* createMuteConverter(std::vector<std::string> threads, std::vector<unsigned int> parameters) {
+		return new muteConverter(threads, parameters);
 	}
 	
 	const bool registered = ConverterFactory.Register("mute", createMuteConverter);

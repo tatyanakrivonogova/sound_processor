@@ -14,8 +14,8 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> time_args) {
-		return new mixConverter(threadFiles, time_args);
+	Converter* createMixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
+		return new mixConverter(threadFiles, parameters);
 	}
 
 	const bool registered = ConverterFactory.Register("mix", createMixConverter);

@@ -13,7 +13,7 @@ private:
 
 public:
 	//muteConverter(Thread& thread, unsigned int time_begin, unsigned int duration) : thread(thread), time_begin(time_begin), duration(duration) {}
-	mixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> time_args) : threadFile1(threadFiles[0]), threadFile2(threadFiles[1]), time_begin(time_args[0]) {}
+	mixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) : threadFile1(threadFiles[0]), threadFile2(threadFiles[1]), time_begin(parameters[0]) {}
 	~mixConverter() = default;
 
 	Thread convert() override;
