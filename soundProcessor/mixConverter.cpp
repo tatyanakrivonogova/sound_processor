@@ -24,6 +24,7 @@ namespace {
 
 Thread mixConverter::convert() {
 
+
 	Thread thread1(std::make_shared<std::string>(threadFile1));
 	inputThread inputThread1(threadFile1, thread1);
 	inputThread1.input();
@@ -31,6 +32,17 @@ Thread mixConverter::convert() {
 	Thread thread2(std::make_shared<std::string>(threadFile2));
 	inputThread inputThread2(threadFile2, thread2);
 	inputThread2.input();
+
+	//size_t begin = time_begin * 44100;
+	size_t begin = time_begin * 44100;
+	//size_t end = (time_begin + duration) * 44100;
+	//size_t end = (thread1.getHeader().get_subchunk3_size() - begin <= thread2.getHeader().get_subchunk3_size())
+		//? thread1.getHeader().get_subchunk3_size() : begin + thread2.getHeader().get_subchunk3_size();
+	size_t end = (thread1.getNumberOfSamples() - begin <= thread2.getNumberOfSamples())
+		? thread1.getNumberOfSamples() : begin + thread2.getNumberOfSamples();
+	//size_t data_size = thread1.getHeader().get_subchunk3_size() / 2; //1 sample = 2 bit
+	size_t data_size = thread1.getNumberOfSamples();
+	//size_t data_size = thread.getHeader().get_chunk_size() - thread.getData();
 
 	FILE* fin1;
 	fopen_s(&fin1, (*thread1.getFile()).c_str(), "rb");
@@ -63,21 +75,13 @@ Thread mixConverter::convert() {
 	writeBuffer writeBuf(BUFF_SIZE, fout, newThread.getData());
 
 
-	size_t begin = time_begin * 44100;
-	//size_t end = (time_begin + duration) * 44100;
-	size_t end = (thread1.getHeader().get_subchunk3_size() - begin <= thread2.getHeader().get_subchunk3_size())
-		? thread1.getHeader().get_subchunk3_size() : begin + thread2.getHeader().get_subchunk3_size();
-	size_t data_size = thread1.getHeader().get_subchunk3_size() / 2; //1 sample = 2 bit
-	//size_t data_size = thread.getHeader().get_chunk_size() - thread.getData();
-
-
 	//before begin
 	for (size_t i = 0; i < begin; ++i) {
 		writeBuf >> readBuff1[i];
 	}
 
 	//changing
-	for (size_t i1 = begin, i2 = 0; i1 < end; ++i1, ++i2) {
+	for (size_t i1 = begin, i2 = 0; i1 < (end-begin)/2; ++i1, ++i2) {
 		writeBuf >> readBuff1[i1] + readBuff2[i2];
 	}
 
@@ -86,5 +90,8 @@ Thread mixConverter::convert() {
 		writeBuf >> readBuff1[i];
 	}
 
+	fclose(fin1);
+	fclose(fin2);
+	fclose(fout);
 	return newThread;
 }

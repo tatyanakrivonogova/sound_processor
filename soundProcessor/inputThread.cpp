@@ -15,15 +15,14 @@ void swap_pointers(char* a, char* b) {
 int inputThread::input() {
 	FILE* fin;
 	fopen_s(&fin, inputFile.c_str(), "rb");
+	//fopen(fin, inputFile.c_str(), "rb");
 
 	if (!fin) {
 		std::cout << "File is not available" << std::endl;
 		return -1;
 	}
-	thread.setFile(std::make_shared<std::string>(inputFile));
+	//thread.setFile(std::make_shared<std::string>(inputFile));
 
-	/*char* buffer4 = new char[4];
-	char* buffer2 = new char[2];*/
 	char buffer2[2];
 	char buffer4[4];
 
@@ -103,15 +102,16 @@ int inputThread::input() {
 	if (std::string((char*)thread.getHeader().get_subchunk2_ID(), 4) == "fact") {
 		std::cout << "Find chunk 'fact'" << std::endl;
 
-
 		fread(&thread.getHeader().get_subchunk2_size(), 4, 1, fin);
 		rest_bytes -= 4;
 		std::cout << " fact size " << thread.getHeader().get_subchunk2_size() << std::endl;
 		fread(thread.getHeader().get_subchunk2_data(), 1, thread.getHeader().get_subchunk2_size(), fin);
+		//fseek(fin, SEEK_CUR, thread.getHeader().get_subchunk2_size());
 		rest_bytes -= thread.getHeader().get_subchunk2_size();
 
 		fread(thread.getHeader().get_subchunk3_ID(), 1, 4, fin);
 		rest_bytes -= 4;
+
 	}
 	else if (std::string((char*)thread.getHeader().get_subchunk2_ID(), 4) == "LIST") {
 		std::cout << "Find chunk 'list'" << std::endl;
@@ -142,6 +142,7 @@ int inputThread::input() {
 
 
 	thread.setData(ftell(fin));
+	thread.setNumberOfSamples(thread.getHeader().get_subchunk3_size() / 2);
 
 	std::cout << "OK!" << std::endl;
 	std::cout << rest_bytes << std::endl;

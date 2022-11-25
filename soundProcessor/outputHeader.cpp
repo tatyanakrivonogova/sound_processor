@@ -47,6 +47,10 @@ void outputHeader::output() {
 	buffer2[1] = char((header.get_bits_per_sample() >> 8) & 0xff);
 	fwrite(buffer2, 1, 2, fout);
 
+	/*fwrite(header.get_subchunk2_ID(), 1, 4, fout);
+	fwrite(&header.get_subchunk2_size(), 4, 1, fout);
+	fwrite(header.get_subchunk2_data(), 1, header.get_subchunk2_size(), fout);*/
+
 	fwrite(header.get_subchunk3_ID(), 1, 4, fout);
 	fwrite(&header.get_subchunk3_size(), 4, 1, fout);
 

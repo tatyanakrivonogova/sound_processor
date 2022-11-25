@@ -78,5 +78,7 @@ Thread muteConverter::convert() {
 		writeBuf >> readBuff[i];
 	}
 
+	fclose(fin);
+	fclose(fout);
 	return newThread;
 }

@@ -19,7 +19,7 @@ const short readBuffer::operator[](size_t pos) {
 		fseek(file, begin_position + 2*pos, SEEK_SET);
 		//std::cout << ftell(file) << std::endl;
 		fullness = fread(buff, sizeof(short), BUFF_SIZE, file);
-		current_position = pos;
+		current_position = pos;//!!!!!!!!!!!!!!!!!!
 		if (pos >= current_position and pos < (current_position + fullness)) {
 			return buff[pos - current_position];
 		}

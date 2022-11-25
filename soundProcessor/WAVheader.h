@@ -17,7 +17,7 @@ private:
 
 	char subchunk2_ID[4];
 	unsigned int subchunk2_size;
-	char subchunk2_data[250];
+	char subchunk2_data[500];
 
 	char subchunk3_ID[4];
 	unsigned int subchunk3_size;

@@ -124,6 +124,30 @@ WAVheader& WAVheader::operator=(const WAVheader& otherThread) {
     subchunk2_size = otherThread.subchunk2_size;
     subchunk3_size = otherThread.subchunk3_size;
 
+    for (int i = 0; i < 4; ++i) {
+        chunk_ID[i] = otherThread.chunk_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        format[i] = otherThread.format[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk1_ID[i] = otherThread.subchunk1_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk2_ID[i] = otherThread.subchunk2_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk2_data[i] = otherThread.subchunk2_data[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk3_ID[i] = otherThread.subchunk3_ID[i];
+    }
+
     return *this;
 }
 
@@ -141,6 +165,30 @@ WAVheader& WAVheader::operator=(WAVheader&& otherThread) noexcept {
     bits_per_sample = otherThread.bits_per_sample;
     subchunk2_size = otherThread.subchunk2_size;
     subchunk3_size = otherThread.subchunk3_size;
+
+    for (int i = 0; i < 4; ++i) {
+        chunk_ID[i] = otherThread.chunk_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        format[i] = otherThread.format[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk1_ID[i] = otherThread.subchunk1_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk2_ID[i] = otherThread.subchunk2_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk2_data[i] = otherThread.subchunk2_data[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk3_ID[i] = otherThread.subchunk3_ID[i];
+    }
 
     return *this;
 }
