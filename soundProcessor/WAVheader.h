@@ -15,9 +15,9 @@ private:
 	unsigned int block_align;
 	unsigned int bits_per_sample;
 
-	char subchunk2_ID[4];
-	unsigned int subchunk2_size;
-	char subchunk2_data[500];
+	//char subchunk2_ID[4];
+	//unsigned int subchunk2_size;
+	//char subchunk2_data[500];
 
 	char subchunk3_ID[4];
 	unsigned int subchunk3_size;
@@ -40,13 +40,13 @@ public:
 	unsigned int& get_byte_rate();
 	unsigned int& get_block_align();
 	unsigned int& get_bits_per_sample();
-	unsigned int& get_subchunk2_size();
+	//unsigned int& get_subchunk2_size();
 	unsigned int& get_subchunk3_size();
 
 	char* get_chunk_ID();
 	char* get_format();
 	char* get_subchunk1_ID();
-	char* get_subchunk2_ID();
-	char* get_subchunk2_data();
+	//char* get_subchunk2_ID();
+	//char* get_subchunk2_data();
 	char* get_subchunk3_ID();
 };

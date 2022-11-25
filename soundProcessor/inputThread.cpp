@@ -96,40 +96,44 @@ int inputThread::input() {
 	rest_bytes -= 2;
 
 	std::cout << " 2 ID " << ftell(fin) << std::endl;
-	fread(thread.getHeader().get_subchunk2_ID(), 1, 4, fin);
+	fread(thread.getHeader().get_subchunk3_ID(), 1, 4, fin);
 	rest_bytes -= 4;
 
-	if (std::string((char*)thread.getHeader().get_subchunk2_ID(), 4) == "fact") {
-		std::cout << "Find chunk 'fact'" << std::endl;
-
-		fread(&thread.getHeader().get_subchunk2_size(), 4, 1, fin);
+	if (std::string((char*)thread.getHeader().get_subchunk3_ID(), 4) == "fact") {
+		//std::cout << "Find chunk 'fact'" << std::endl;
+		unsigned int fact_size;
+		//fread(&thread.getHeader().get_subchunk2_size(), 4, 1, fin);
+		fread(&fact_size, 4, 1, fin);
 		rest_bytes -= 4;
-		std::cout << " fact size " << thread.getHeader().get_subchunk2_size() << std::endl;
-		fread(thread.getHeader().get_subchunk2_data(), 1, thread.getHeader().get_subchunk2_size(), fin);
-		//fseek(fin, SEEK_CUR, thread.getHeader().get_subchunk2_size());
-		rest_bytes -= thread.getHeader().get_subchunk2_size();
+		//std::cout << " fact size " << thread.getHeader().get_subchunk2_size() << std::endl;
+		//fread(thread.getHeader().get_subchunk2_data(), 1, thread.getHeader().get_subchunk2_size(), fin);
+		fseek(fin, fact_size, SEEK_CUR);
+		//rest_bytes -= thread.getHeader().get_subchunk2_size();
+		rest_bytes -= fact_size;
 
 		fread(thread.getHeader().get_subchunk3_ID(), 1, 4, fin);
 		rest_bytes -= 4;
 
 	}
-	else if (std::string((char*)thread.getHeader().get_subchunk2_ID(), 4) == "LIST") {
-		std::cout << "Find chunk 'list'" << std::endl;
+	else if (std::string((char*)thread.getHeader().get_subchunk3_ID(), 4) == "LIST") {
+		//std::cout << "Find chunk 'list'" << std::endl;
+		unsigned int list_size;
 
-
-		fread(&thread.getHeader().get_subchunk2_size(), 4, 1, fin);
+		//fread(&thread.getHeader().get_subchunk2_size(), 4, 1, fin);
+		fread(&list_size, 4, 1, fin);
 		rest_bytes -= 4;
-		std::cout << " list size " << thread.getHeader().get_subchunk2_size() << std::endl;
-		fread(thread.getHeader().get_subchunk2_data(), 1, thread.getHeader().get_subchunk2_size(), fin);
-		rest_bytes -= thread.getHeader().get_subchunk2_size();
+		//std::cout << " list size " << thread.getHeader().get_subchunk2_size() << std::endl;
+		//fread(thread.getHeader().get_subchunk2_data(), 1, thread.getHeader().get_subchunk2_size(), fin);
+		fseek(fin, list_size, SEEK_CUR);
+		rest_bytes -= list_size;
 
-		std::cout << " 3 ID " << ftell(fin) << std::endl;
+		//std::cout << " 3 ID " << ftell(fin) << std::endl;
 		fread(thread.getHeader().get_subchunk3_ID(), 1, 4, fin);
 		rest_bytes -= 4;
 	}
-	else {
+	/*else {
 		std::memcpy(thread.getHeader().get_subchunk3_ID(), thread.getHeader().get_subchunk2_ID(), sizeof(char) * 4);
-	}
+	}*/
 
 	if (std::string((char*)thread.getHeader().get_subchunk3_ID(), 4) != "data") {
 		std::cout << "Can not find chunk 'data'" << std::endl;
