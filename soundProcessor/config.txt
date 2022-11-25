@@ -1,6 +1,6 @@
 # заглушить первые 30 секунд input1
 mute 10 10
 # смиксовать с input2, начиная с секунды 10
-mix district_four.wav 10
+mix district_four.wav
 # заглушить 3-ю минуту в миксованном потоке
 #mute 120 180

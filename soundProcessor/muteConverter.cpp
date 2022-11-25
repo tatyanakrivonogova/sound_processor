@@ -22,6 +22,24 @@ namespace {
 	const bool registered = ConverterFactory.Register("mute", createMuteConverter);
 }
 
+muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
+	threadFile = threadFiles[0];
+	if (parameters.size() == 2) {
+		time_begin = parameters[0];
+		duration = parameters[1]; 
+	}
+	else if (parameters.size() == 1) {
+		//throw std::runtime_error("Expected mixing start time");
+		time_begin = 0;
+		duration = parameters[0];
+	}
+	else if (parameters.size() == 0) {
+		throw std::runtime_error("Expected muting duration");
+	}
+	else {
+		throw std::invalid_argument("Extra arguments for muting");
+	}
+}
 
 Thread muteConverter::convert() {
 
@@ -32,9 +50,6 @@ Thread muteConverter::convert() {
 	FILE* fin;
 	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
 
-	//fseek(fin, 0, SEEK_END);
-	//std::cout << "fin: " << ftell(fin) << std::endl;
-	//fseek(fin, 0, SEEK_SET);
 
 	readBuffer readBuff(BUFF_SIZE, fin, thread.getData());
 
@@ -50,17 +65,19 @@ Thread muteConverter::convert() {
 	outputHeader outputHeader(fout, newThread.getHeader());
 	outputHeader.output();
 
-	
 
 	writeBuffer writeBuf(BUFF_SIZE, fout, newThread.getData());
 	
-
-	size_t begin = time_begin * 44100;
-	size_t end = (time_begin + duration) * 44100;
-	//size_t data_size = thread.getHeader().get_subchunk3_size();
 	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
-	std::cout << " size: " << thread.getHeader().get_chunk_size() << std::endl;
-	std::cout << " size3: " << thread.getHeader().get_subchunk3_size() << std::endl;
+	size_t begin = time_begin * 44100;
+	if (begin > data_size) {
+		throw std::invalid_argument("Unavailable argument of begin_time");
+	}
+
+	size_t end = (time_begin + duration) * 44100;
+	if (end > data_size) {
+		throw std::invalid_argument("Unavailable argument of duration");
+	}
 
 
 	//before begin

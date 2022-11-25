@@ -21,6 +21,27 @@ namespace {
 	const bool registered = ConverterFactory.Register("mix", createMixConverter);
 }
 
+mixConverter::mixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
+	threadFile1 = threadFiles[0];
+
+	if (threadFiles.size() == 2) {
+		threadFile2 = threadFiles[1];
+	}
+	else if (threadFiles.size() < 2) {
+		throw std::runtime_error("Expected second input file");
+	}
+	else {
+		throw std::invalid_argument("Extra arguments for mixing");
+	}
+
+	if (!parameters.empty()) {
+		time_begin = parameters[0];
+	}
+	else {
+		//throw std::invalid_argument("Expected mixing start time");
+		time_begin = 0;
+	}
+}
 
 Thread mixConverter::convert() {
 
@@ -33,16 +54,18 @@ Thread mixConverter::convert() {
 	inputThread inputThread2(threadFile2, thread2);
 	inputThread2.input();
 
-	//size_t begin = time_begin * 44100;
+
+	size_t data_size = thread1.getNumberOfSamples();
 	size_t begin = time_begin * 44100;
-	//size_t end = (time_begin + duration) * 44100;
-	//size_t end = (thread1.getHeader().get_subchunk3_size() - begin <= thread2.getHeader().get_subchunk3_size())
-		//? thread1.getHeader().get_subchunk3_size() : begin + thread2.getHeader().get_subchunk3_size();
+	if (begin > data_size) {
+		throw std::invalid_argument("Unavailable argument of begin_time");
+	}
 	size_t end = (thread1.getNumberOfSamples() - begin <= thread2.getNumberOfSamples())
 		? thread1.getNumberOfSamples() : begin + thread2.getNumberOfSamples();
-	//size_t data_size = thread1.getHeader().get_subchunk3_size() / 2; //1 sample = 2 bit
-	size_t data_size = thread1.getNumberOfSamples();
-	//size_t data_size = thread.getHeader().get_chunk_size() - thread.getData();
+	if (end > data_size) {
+		throw std::invalid_argument("Unavailable argument of duration");
+	}
+
 
 	FILE* fin1;
 	fopen_s(&fin1, (*thread1.getFile()).c_str(), "rb");
@@ -50,9 +73,6 @@ Thread mixConverter::convert() {
 	FILE* fin2;
 	fopen_s(&fin2, (*thread2.getFile()).c_str(), "rb");
 
-	//fseek(fin, 0, SEEK_END);
-	//std::cout << "fin: " << ftell(fin) << std::endl;
-	//fseek(fin, 0, SEEK_SET);
 
 	readBuffer readBuff1(BUFF_SIZE, fin1, thread1.getData());
 	readBuffer readBuff2(BUFF_SIZE, fin2, thread2.getData());
@@ -64,13 +84,12 @@ Thread mixConverter::convert() {
 	newThread.setHeader(thread1.getHeader());
 	newThread.setData(thread1.getData());
 
+
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
 
-
 	outputHeader outputHeader(fout, newThread.getHeader());
 	outputHeader.output();
-
 
 	writeBuffer writeBuf(BUFF_SIZE, fout, newThread.getData());
 

@@ -20,7 +20,7 @@ AbstractFactory<Converter, std::string> ConverterFactory;
 size_t getNumberOfThreads(std::vector<std::string> command) {
 	size_t current_arg = 1; // miss name of converter
 	size_t count = 0;
-	while (command[current_arg].find(".wav") != std::string::npos) {
+	while (current_arg < command.size() and command[current_arg].find(".wav") != std::string::npos) {
 		++current_arg;
 		++count;
 	}
@@ -79,8 +79,18 @@ int main(int argc, char** argv) {
 			std::cout << ex.what() << '\n';
 			return 0;
 		}
-			
-		thread = current_converter->convert();
+		catch (std::invalid_argument const& ex) {
+			std::cout << ex.what() << '\n';
+			//return 0;
+		}
+		
+		try {
+			thread = current_converter->convert();
+		}
+		catch (std::invalid_argument const& ex) {
+			std::cout << ex.what() << '\n';
+			return 0;
+		}
 	}
 
 	return 0;

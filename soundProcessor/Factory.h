@@ -20,7 +20,15 @@ public:
         if (it == map_.end()) {
             throw std::runtime_error("Undefined ID of converter");
         }
-        return (it->second)(threadFiles, parameters);
+        try {
+            return (it->second)(threadFiles, parameters);
+        }
+        catch (std::invalid_argument const& ex) {
+            throw ex;
+        }
+        catch (std::runtime_error const& ex) {
+            throw ex;
+        }
     }
 
 private:

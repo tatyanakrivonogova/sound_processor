@@ -8,12 +8,10 @@ class mixConverter : public Converter
 private:
 	std::string threadFile1;
 	std::string threadFile2;
-	const unsigned int time_begin;
-	//const unsigned int duration;
+	unsigned int time_begin = 0;
 
 public:
-	//muteConverter(Thread& thread, unsigned int time_begin, unsigned int duration) : thread(thread), time_begin(time_begin), duration(duration) {}
-	mixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) : threadFile1(threadFiles[0]), threadFile2(threadFiles[1]), time_begin(parameters[0]) {}
+	mixConverter(std::vector<std::string>, std::vector<unsigned int>);
 	~mixConverter() = default;
 
 	Thread convert() override;
