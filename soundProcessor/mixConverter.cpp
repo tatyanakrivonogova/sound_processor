@@ -43,6 +43,15 @@ mixConverter::mixConverter(std::vector<std::string> threadFiles, std::vector<uns
 	}
 }
 
+void mixConverter::whatAreYouDoing(FILE* fout) {
+	std::string info;
+	info += "\t\tmixConverter\n";
+	info += "command: mix [second thread] [start]\n";
+	info += "mixing of the main and second streams starting from 'start' second (default start = 0)\n";
+	fseek(fout, 0, SEEK_END);
+	fwrite(info.data(), sizeof(char), info.size(), fout);
+}
+
 Thread mixConverter::convert() {
 
 
@@ -64,6 +73,9 @@ Thread mixConverter::convert() {
 		? thread1.getNumberOfSamples() : begin + thread2.getNumberOfSamples();
 	if (end > data_size) {
 		throw std::invalid_argument("Unavailable argument of duration");
+	}
+	if (begin > end) {
+		throw std::invalid_argument("Unavailable argument of begin_time");
 	}
 
 
@@ -101,7 +113,13 @@ Thread mixConverter::convert() {
 
 	//changing
 	for (size_t i1 = begin, i2 = 0; i1 < (end-begin)/2; ++i1, ++i2) {
-		writeBuf >> readBuff1[i1] + readBuff2[i2];
+
+		if (static_cast<int>(readBuff1[i1] + readBuff2[i2]) > SHRT_MAX) {
+			writeBuf >> SHRT_MAX;
+		}
+		else {
+			writeBuf >> readBuff1[i1] + readBuff2[i2];
+		}
 	}
 
 	//after end

@@ -29,7 +29,6 @@ muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<u
 		duration = parameters[1]; 
 	}
 	else if (parameters.size() == 1) {
-		//throw std::runtime_error("Expected mixing start time");
 		time_begin = 0;
 		duration = parameters[0];
 	}
@@ -39,6 +38,15 @@ muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<u
 	else {
 		throw std::invalid_argument("Extra arguments for muting");
 	}
+}
+
+void muteConverter::whatAreYouDoing(FILE* fout) {
+	std::string info;
+	info += "\t\tmureConverter\n";
+	info += "command: mute [start] [duration]\n";
+	info += "muting of stream from 'start' to 'start+duration' seconds\n";
+	fseek(fout, 0, SEEK_END);
+	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
 Thread muteConverter::convert() {
