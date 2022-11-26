@@ -91,12 +91,12 @@ Thread muteConverter::convert() {
 	writeBuffer writeBuff(BUFF_SIZE, fout, newThread.getData());
 	
 	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
-	size_t begin = time_begin * 44100;
+	size_t begin = time_begin * thread.getHeader().get_sample_rate();
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time");
 	}
 
-	size_t end = (time_begin + duration) * 44100;
+	size_t end = (time_begin + duration) * thread.getHeader().get_sample_rate();
 	if (end > data_size) {
 		throw std::runtime_error("Unavailable argument of duration");
 	}

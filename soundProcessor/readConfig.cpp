@@ -12,6 +12,23 @@ bool isComment(std::string str) {
 	return (str[pos] == '#') ? true : false;
 }
 
+bool isDigit(char c) {
+	return c >= '0' and c <= '9';
+}
+
+size_t getThreadNumber(std::string arg) {
+	std::string number;
+	size_t pos = 0;
+	while (!isDigit(arg[pos])) {
+		++pos;
+	}
+	while (isDigit(arg[pos])) {
+		number += arg[pos];
+		++pos;
+	}
+	return stoi(number);
+}
+
 void getCommand(std::vector<std::string>& command, std::string str) {
 
 	std::string arg;
@@ -52,6 +69,14 @@ void readConfig::read(std::vector<std::vector<std::string> >& config) {
 		if (!isComment(str)) {
 			getCommand(command, str);
 
+			for (std::vector<std::string>::iterator it = command.begin(); it < command.end(); ++it) {
+				if ((*it).front() == '$') {
+					int thread_number = getThreadNumber(*it);
+					/*command.insert(it, inputFiles[thread_number - 1]);
+					command.erase(it);*/
+					*it = inputFiles[thread_number - 1];
+				}
+			}
 			config.push_back(command);
 			command.clear();
 		}
