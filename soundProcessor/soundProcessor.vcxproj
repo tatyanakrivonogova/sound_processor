@@ -151,6 +151,7 @@
     <ClCompile Include="outputThread.cpp" />
     <ClCompile Include="readBuffer.cpp" />
     <ClCompile Include="readConfig.cpp" />
+    <ClCompile Include="slowConverter.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="WAVheader.cpp" />
     <ClCompile Include="writeBuffer.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="outputThread.h" />
     <ClInclude Include="readBuffer.h" />
     <ClInclude Include="readConfig.h" />
+    <ClInclude Include="slowConverter.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="WAVheader.h" />
     <ClInclude Include="writeBuffer.h" />

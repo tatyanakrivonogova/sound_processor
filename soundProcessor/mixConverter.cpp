@@ -46,7 +46,7 @@ void mixConverter::whatAreYouDoing(FILE* fout) {
 	std::string info;
 	info += "\t\tmixConverter\n";
 	info += "command: mix [second thread] [start]\n";
-	info += "mixing of the main and second streams starting from 'start' second (default start = 0)\n";
+	info += "mixing of the main and second streams starting from [start] second (default start = 0)\n";
 	fseek(fout, 0, SEEK_END);
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }

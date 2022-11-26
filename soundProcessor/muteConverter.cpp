@@ -42,9 +42,9 @@ muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<u
 
 void muteConverter::whatAreYouDoing(FILE* fout) {
 	std::string info;
-	info += "\t\tmureConverter\n";
+	info += "\t\tmuteConverter\n";
 	info += "command: mute [start] [duration]\n";
-	info += "muting of stream from 'start' to 'start+duration' seconds\n";
+	info += "muting of stream from [start] to [start+duration] seconds\n";
 	fseek(fout, 0, SEEK_END);
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }

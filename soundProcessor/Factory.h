@@ -31,9 +31,9 @@ public:
         }
     }
 
-    std::map <IdentifierType, ProductCreator>& getMap() {
-        return map_;
-    }
+    //std::map <IdentifierType, ProductCreator>& getMap() {
+    //    return map_;
+    //}
 
 private:
     typedef std::map <IdentifierType, ProductCreator> AssocMap;
