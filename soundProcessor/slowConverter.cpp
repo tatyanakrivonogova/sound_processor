@@ -15,14 +15,15 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createSlowConverter(std::vector<std::string> threads, std::vector<unsigned int> parameters) {
-		return new slowConverter(threads, parameters);
+	Converter* createSlowConverter(std::vector<std::string> threads, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+		return new slowConverter(threads, parameters, outputFile);
 	}
 
 	const bool registered = ConverterFactory.Register("slow", createSlowConverter);
 }
 
-slowConverter::slowConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
+slowConverter::slowConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+	this->outputFile = outputFile;
 	threadFile = threadFiles[0];
 	if (parameters.size() == 3) {
 		time_begin = parameters[0];
@@ -75,8 +76,14 @@ Thread slowConverter::convert() {
 
 
 	Thread newThread(thread);
-	std::string newFile = "slowed_" + (*thread.getFile());
-	newThread.setFile(std::make_shared<std::string>(newFile));
+	if (outputFile == nullptr) {
+		std::string newFile = "slowed_" + (*thread.getFile());
+		newThread.setFile(std::make_shared<std::string>(newFile));
+	}
+	else {
+		newThread.setFile(outputFile);
+	}
+
 
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");

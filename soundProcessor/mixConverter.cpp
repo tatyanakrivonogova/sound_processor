@@ -14,14 +14,15 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
-		return new mixConverter(threadFiles, parameters);
+	Converter* createMixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+		return new mixConverter(threadFiles, parameters, outputFile);
 	}
 
 	const bool registered = ConverterFactory.Register("mix", createMixConverter);
 }
 
-mixConverter::mixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
+mixConverter::mixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+	this->outputFile = outputFile;
 	threadFile1 = threadFiles[0];
 
 	if (threadFiles.size() == 2) {
@@ -103,8 +104,14 @@ Thread mixConverter::convert() {
 
 
 	Thread newThread;
-	std::string newFile = "mixed_" + (*thread1.getFile()) + '_' + (*thread2.getFile());
-	newThread.setFile(std::make_shared<std::string>(newFile));
+	if (outputFile == nullptr) {
+		std::string newFile = "mixed_" + (*thread1.getFile()) + '_' + (*thread2.getFile());
+		newThread.setFile(std::make_shared<std::string>(newFile));
+	}
+	else {
+		newThread.setFile(outputFile);
+	}
+	
 	newThread.setHeader(thread1.getHeader());
 	newThread.setData(thread1.getData());
 

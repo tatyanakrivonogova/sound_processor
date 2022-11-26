@@ -73,7 +73,12 @@ int main(int argc, char** argv) {
 
 		std::shared_ptr<Converter> current_converter;
 		try {
-			current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, parameters));
+			if (i == config.size() - 1) {
+				current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, parameters, std::make_shared<std::string>(outputFile)));
+			}
+			else {
+				current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, parameters));
+			}
 		}
 		catch (std::runtime_error const& ex) {
 			std::cerr << ex.what() << '\n';

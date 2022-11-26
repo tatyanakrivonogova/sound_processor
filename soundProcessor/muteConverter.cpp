@@ -15,14 +15,15 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMuteConverter(std::vector<std::string> threads, std::vector<unsigned int> parameters) {
-		return new muteConverter(threads, parameters);
+	Converter* createMuteConverter(std::vector<std::string> threads, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+		return new muteConverter(threads, parameters, outputFile);
 	}
 	
 	const bool registered = ConverterFactory.Register("mute", createMuteConverter);
 }
 
-muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters) {
+muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+	this->outputFile = outputFile;
 	threadFile = threadFiles[0];
 	if (parameters.size() == 2) {
 		time_begin = parameters[0];
@@ -70,8 +71,13 @@ Thread muteConverter::convert() {
 
 
 	Thread newThread(thread);
-	std::string newFile = "muted_" + (*thread.getFile());
-	newThread.setFile(std::make_shared<std::string>(newFile));
+	if (outputFile == nullptr) {
+		std::string newFile = "muted_" + (*thread.getFile());
+		newThread.setFile(std::make_shared<std::string>(newFile));
+	}
+	else {
+		newThread.setFile(outputFile);
+	}
 
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
