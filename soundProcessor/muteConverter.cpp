@@ -53,11 +53,18 @@ Thread muteConverter::convert() {
 
 	Thread thread(std::make_shared<std::string>(threadFile));
 	inputThread inputThread1(threadFile, thread);
-	inputThread1.input();
+	try {
+		inputThread1.input();
+	}
+	catch (std::runtime_error const& ex) {
+		throw ex;
+	}
 
 	FILE* fin;
 	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
-
+	if (!fin) {
+		throw std::runtime_error("Unavailable input file");
+	}
 
 	readBuffer readBuff(BUFF_SIZE, fin, thread.getData());
 
@@ -68,13 +75,20 @@ Thread muteConverter::convert() {
 
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
-
+	if (!fout) {
+		throw std::runtime_error("Unavailable output file");
+	}
 
 	outputHeader outputHeader(fout, newThread.getHeader());
-	outputHeader.output();
+	try {
+		outputHeader.output();
+	}
+	catch (std::runtime_error const& ex) {
+		throw ex;
+	}
 
 
-	writeBuffer writeBuf(BUFF_SIZE, fout, newThread.getData());
+	writeBuffer writeBuff(BUFF_SIZE, fout, newThread.getData());
 	
 	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
 	size_t begin = time_begin * 44100;
@@ -86,21 +100,23 @@ Thread muteConverter::convert() {
 	if (end > data_size) {
 		throw std::invalid_argument("Unavailable argument of duration");
 	}
-
+	if (begin > end) {
+		throw std::invalid_argument("Unavailable argument of begin_time");
+	}
 
 	//before begin
 	for (size_t i = 0; i < begin; ++i) {
-		writeBuf >> readBuff[i];
+		writeBuff >> readBuff[i];
 	}
 
 	//changing
 	for (size_t i = begin; i < end; ++i) {
-		writeBuf >> 0;
+		writeBuff >> 0;
 	}
 
 	//after end
 	for (size_t i = end; i < data_size; ++i) {
-		writeBuf >> readBuff[i];
+		writeBuff >> readBuff[i];
 	}
 
 	fclose(fin);

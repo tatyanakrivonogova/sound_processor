@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
 		CmdArgumentHandler.getCmdArgs(argc, argv, configFile, outputFile, inputFiles, help);
 	}
 	catch (std::invalid_argument const& ex) {
-		std::cout << ex.what() << '\n';
-		return 0;
+		std::cerr << ex.what() << '\n';
+		return -1;
 	}
 
 	std::vector<std::vector<std::string> > config;
@@ -66,8 +66,8 @@ int main(int argc, char** argv) {
 				parameters.push_back(stoi(config[i][j]));
 			}
 			catch (std::invalid_argument const& ex) {
-				std::cout << ex.what() << '\n';
-				return 0;
+				std::cerr << ex.what() << '\n';
+				return -1;
 			}
 		}
 
@@ -76,20 +76,19 @@ int main(int argc, char** argv) {
 			current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, parameters));
 		}
 		catch (std::runtime_error const& ex) {
-			std::cout << ex.what() << '\n';
-			return 0;
+			std::cerr << ex.what() << '\n';
+			return -1;
 		}
 		catch (std::invalid_argument const& ex) {
-			std::cout << ex.what() << '\n';
-			//return 0;
+			std::cerr << ex.what() << '\n';
 		}
 		
 		try {
 			thread = current_converter->convert();
 		}
 		catch (std::invalid_argument const& ex) {
-			std::cout << ex.what() << '\n';
-			return 0;
+			std::cerr << ex.what() << '\n';
+			return -1;
 		}
 	}
 

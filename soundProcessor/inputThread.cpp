@@ -15,13 +15,9 @@ void swap_pointers(char* a, char* b) {
 int inputThread::input() {
 	FILE* fin;
 	fopen_s(&fin, inputFile.c_str(), "rb");
-	//fopen(fin, inputFile.c_str(), "rb");
-
 	if (!fin) {
-		std::cout << "File is not available" << std::endl;
-		return -1;
+		throw std::runtime_error("Unavailable input file");
 	}
-	//thread.setFile(std::make_shared<std::string>(inputFile));
 
 	char buffer2[2];
 	char buffer4[4];

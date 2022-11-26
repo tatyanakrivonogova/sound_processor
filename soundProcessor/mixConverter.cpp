@@ -57,11 +57,21 @@ Thread mixConverter::convert() {
 
 	Thread thread1(std::make_shared<std::string>(threadFile1));
 	inputThread inputThread1(threadFile1, thread1);
-	inputThread1.input();
+	try {
+		inputThread1.input();
+	}
+	catch (std::runtime_error const& ex) {
+		throw ex;
+	}
 
 	Thread thread2(std::make_shared<std::string>(threadFile2));
 	inputThread inputThread2(threadFile2, thread2);
-	inputThread2.input();
+	try {
+		inputThread2.input();
+	}
+	catch (std::runtime_error const& ex) {
+		throw ex;
+	}
 
 
 	size_t data_size = thread1.getNumberOfSamples();
@@ -74,16 +84,22 @@ Thread mixConverter::convert() {
 	if (end > data_size) {
 		throw std::invalid_argument("Unavailable argument of duration");
 	}
-	if (begin > end) {
-		throw std::invalid_argument("Unavailable argument of begin_time");
-	}
+	//if (begin > end) {
+	//	throw std::invalid_argument("Unavailable argument of begin_time");
+	//}
 
 
 	FILE* fin1;
 	fopen_s(&fin1, (*thread1.getFile()).c_str(), "rb");
+	if (!fin1) {
+		throw std::runtime_error("Unavailable input file");
+	}
 
 	FILE* fin2;
 	fopen_s(&fin2, (*thread2.getFile()).c_str(), "rb");
+	if (!fin2) {
+		throw std::runtime_error("Unavailable input file");
+	}
 
 
 	readBuffer readBuff1(BUFF_SIZE, fin1, thread1.getData());
@@ -99,32 +115,40 @@ Thread mixConverter::convert() {
 
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
+	if (!fout) {
+		throw std::runtime_error("Unavailable output file");
+	}
 
 	outputHeader outputHeader(fout, newThread.getHeader());
-	outputHeader.output();
+	try {
+		outputHeader.output();
+	}
+	catch (std::runtime_error const& ex) {
+		throw ex;
+	}
 
-	writeBuffer writeBuf(BUFF_SIZE, fout, newThread.getData());
+	writeBuffer writeBuff(BUFF_SIZE, fout, newThread.getData());
 
 
 	//before begin
 	for (size_t i = 0; i < begin; ++i) {
-		writeBuf >> readBuff1[i];
+		writeBuff >> readBuff1[i];
 	}
 
 	//changing
 	for (size_t i1 = begin, i2 = 0; i1 < (end-begin)/2; ++i1, ++i2) {
 
 		if (static_cast<int>(readBuff1[i1] + readBuff2[i2]) > SHRT_MAX) {
-			writeBuf >> SHRT_MAX;
+			writeBuff >> SHRT_MAX;
 		}
 		else {
-			writeBuf >> readBuff1[i1] + readBuff2[i2];
+			writeBuff >> readBuff1[i1] + readBuff2[i2];
 		}
 	}
 
 	//after end
 	for (size_t i = end; i < data_size; ++i) {
-		writeBuf >> readBuff1[i];
+		writeBuff >> readBuff1[i];
 	}
 
 	fclose(fin1);
