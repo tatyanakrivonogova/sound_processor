@@ -38,7 +38,6 @@ mixConverter::mixConverter(std::vector<std::string> threadFiles, std::vector<uns
 		time_begin = parameters[0];
 	}
 	else {
-		//throw std::invalid_argument("Expected mixing start time");
 		time_begin = 0;
 	}
 }
@@ -77,16 +76,13 @@ Thread mixConverter::convert() {
 	size_t data_size = thread1.getNumberOfSamples();
 	size_t begin = time_begin * 44100;
 	if (begin > data_size) {
-		throw std::invalid_argument("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time");
 	}
 	size_t end = (thread1.getNumberOfSamples() - begin <= thread2.getNumberOfSamples())
 		? thread1.getNumberOfSamples() : begin + thread2.getNumberOfSamples();
 	if (end > data_size) {
-		throw std::invalid_argument("Unavailable argument of duration");
+		throw std::runtime_error("Unavailable argument of duration");
 	}
-	//if (begin > end) {
-	//	throw std::invalid_argument("Unavailable argument of begin_time");
-	//}
 
 
 	FILE* fin1;

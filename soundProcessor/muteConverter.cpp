@@ -93,15 +93,15 @@ Thread muteConverter::convert() {
 	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
 	size_t begin = time_begin * 44100;
 	if (begin > data_size) {
-		throw std::invalid_argument("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time");
 	}
 
 	size_t end = (time_begin + duration) * 44100;
 	if (end > data_size) {
-		throw std::invalid_argument("Unavailable argument of duration");
+		throw std::runtime_error("Unavailable argument of duration");
 	}
 	if (begin > end) {
-		throw std::invalid_argument("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time");
 	}
 
 	//before begin

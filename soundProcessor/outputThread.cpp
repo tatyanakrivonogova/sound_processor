@@ -13,11 +13,6 @@ int outputThread::output() {
 		throw std::runtime_error("Unavailable output file");
 	}
 
-	if (fout == 0) {
-		std::cout << "No output file" << std::endl;
-		return -1;
-	}
-
 	outputHeader outputHeader(fout, thread.getHeader());
 	outputHeader.output();
 
@@ -28,7 +23,7 @@ int outputThread::output() {
 		throw std::runtime_error("Unavailable input file");
 	}
 
-	fseek(fin, thread.getData(), std::ios::beg);
+	fseek(fin, thread.getData(), SEEK_SET);
 	short* buffer = new short[BUF_SIZE];
 
 	for (unsigned int i = 0; i < thread.getHeader().get_subchunk3_size() / BUF_SIZE; ++i) {

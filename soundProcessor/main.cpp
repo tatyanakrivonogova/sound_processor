@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
 		try {
 			thread = current_converter->convert();
 		}
-		catch (std::invalid_argument const& ex) {
+		catch (std::runtime_error const& ex) {
 			std::cerr << ex.what() << '\n';
 			return -1;
 		}
