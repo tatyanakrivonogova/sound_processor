@@ -5,9 +5,13 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 void Help::getHelp() {
-	//std::map <std::string, Converter* (*)(std::vector<std::string>, std::vector<unsigned int>)> registered = ConverterFactory.getMap();
-	//for (auto typeConverter : registered) {
+	FILE* file;
+	fopen_s(&file, "help.txt", "w");
 
-	//}
+	std::map <std::string, Converter* (*)()> registered = ConverterFactory.getMap();
 
+	for (auto it = registered.begin(); it != registered.end(); ++it) {
+		std::shared_ptr<Converter> currentTypeConverter = std::shared_ptr<Converter>((it->second)());
+		currentTypeConverter->whatAreYouDoing(file);
+	}
 }

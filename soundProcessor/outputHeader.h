@@ -5,7 +5,6 @@
 class outputHeader
 {
 private:
-	//std::string& outputFile;
 	FILE* fout;
 	WAVheader& header;
 

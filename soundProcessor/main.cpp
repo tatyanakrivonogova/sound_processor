@@ -14,6 +14,7 @@
 #include "muteConverter.h"
 #include "readConfig.h"
 #include "CmdArgumentHandler.h"
+#include "Help.h"
 
 AbstractFactory<Converter, std::string> ConverterFactory;
 
@@ -35,7 +36,7 @@ int main(int argc, char** argv) {
 	std::string configFile;
 	bool help = false;
 
-	CmdArgumentHandler CmdArgumentHandler(outputFile, inputFiles, configFile, help);
+	CmdArgumentHandler CmdArgumentHandler;
 
 	try {
 		CmdArgumentHandler.getCmdArgs(argc, argv, configFile, outputFile, inputFiles, help);
@@ -45,6 +46,14 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
+	if (help == true) {
+		Help help;
+		help.getHelp();
+	}
+
+	if (outputFile.empty() and configFile.empty() and inputFiles.empty()) {
+		return 0;
+	}
 	std::vector<std::vector<std::string> > config;
 	readConfig readConfig(configFile, inputFiles);
 	readConfig.read(config);
@@ -71,13 +80,15 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		std::shared_ptr<Converter> current_converter;
+		std::shared_ptr<Converter> current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0]));
+		
 		try {
+			
 			if (i == config.size() - 1) {
-				current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, parameters, std::make_shared<std::string>(outputFile)));
+				thread = current_converter->convert(threads, parameters, std::make_shared<std::string>(outputFile));
 			}
 			else {
-				current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0], threads, parameters));
+				thread = current_converter->convert(threads, parameters);
 			}
 		}
 		catch (std::runtime_error const& ex) {
@@ -86,14 +97,6 @@ int main(int argc, char** argv) {
 		}
 		catch (std::invalid_argument const& ex) {
 			std::cerr << ex.what() << '\n';
-		}
-		
-		try {
-			thread = current_converter->convert();
-		}
-		catch (std::runtime_error const& ex) {
-			std::cerr << ex.what() << '\n';
-			return -1;
 		}
 	}
 

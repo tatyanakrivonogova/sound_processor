@@ -15,16 +15,30 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createSlowConverter(std::vector<std::string> threads, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-		return new slowConverter(threads, parameters, outputFile);
+	Converter* createSlowConverter() {
+		return new slowConverter();
 	}
 
 	const bool registered = ConverterFactory.Register("slow", createSlowConverter);
 }
 
-slowConverter::slowConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-	this->outputFile = outputFile;
-	threadFile = threadFiles[0];
+
+void slowConverter::whatAreYouDoing(FILE* fout) {
+	std::string info;
+	info += "slowConverter\n";
+	info += "\tcommand: slow [start] duration ratio\n";
+	info += "\tslowing of stream from 'start' to 'start+duration' seconds by 'ratio' times (default [start = 0])\n";
+	fseek(fout, 0, SEEK_END);
+	fwrite(info.data(), sizeof(char), info.size(), fout);
+}
+
+Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+
+	unsigned int time_begin = 0;
+	unsigned int duration;
+	unsigned int ratio;
+
+	std::string threadFile = threadFiles[0];
 	if (parameters.size() == 3) {
 		time_begin = parameters[0];
 		duration = parameters[1];
@@ -44,18 +58,7 @@ slowConverter::slowConverter(std::vector<std::string> threadFiles, std::vector<u
 	else {
 		throw std::invalid_argument("Extra arguments for slowing");
 	}
-}
 
-void slowConverter::whatAreYouDoing(FILE* fout) {
-	std::string info;
-	info += "\t\tslowConverter\n";
-	info += "command: slow [start] [duration] [ratio]\n";
-	info += "slowing of stream from [start] to [start+duration] seconds by [ratio] times\n";
-	fseek(fout, 0, SEEK_END);
-	fwrite(info.data(), sizeof(char), info.size(), fout);
-}
-
-Thread slowConverter::convert() {
 
 	Thread thread(std::make_shared<std::string>(threadFile));
 	inputThread inputThread1(threadFile, thread);

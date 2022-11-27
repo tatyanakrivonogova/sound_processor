@@ -1,0 +1,12 @@
+mixConverter
+	command: mix second thread [start]
+	mixing of the main and second streams starting from 'start' second (default [start = 0])
+muteConverter
+	command: mute [start] duration
+	muting of stream from 'start' to 'start+duration' seconds (default [start = 0])
+reverbConverter
+	command: reverb [start] duration delay intensity
+	reverbing of stream from 'start' to 'start+duration' seconds with delay of 'delay' and intensity of 'intensity' percent (default [start = 0])
+slowConverter
+	command: slow [start] duration ratio
+	slowing of stream from 'start' to 'start+duration' seconds by 'ratio' times (default [start = 0])

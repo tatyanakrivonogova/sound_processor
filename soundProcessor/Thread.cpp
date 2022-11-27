@@ -2,7 +2,7 @@
 #include "WAVheader.h"
 #include <memory>
 
-Thread::Thread(const Thread& otherThread) : header(otherThread.header), data(otherThread.data), number_of_samples(number_of_samples), file(otherThread.file){}
+Thread::Thread(const Thread& otherThread) : header(otherThread.header), data(otherThread.data), number_of_samples(otherThread.number_of_samples), file(otherThread.file){}
 
 Thread::Thread(Thread&& otherThread) noexcept {
     header = std::move(otherThread.header);

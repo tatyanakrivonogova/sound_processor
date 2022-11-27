@@ -15,15 +15,28 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMuteConverter(std::vector<std::string> threads, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-		return new muteConverter(threads, parameters, outputFile);
+	Converter* createMuteConverter() {
+		return new muteConverter();
 	}
 	
 	const bool registered = ConverterFactory.Register("mute", createMuteConverter);
 }
 
-muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-	this->outputFile = outputFile;
+void muteConverter::whatAreYouDoing(FILE* fout) {
+	std::string info;
+	info += "muteConverter\n";
+	info += "\tcommand: mute [start] duration\n";
+	info += "\tmuting of stream from 'start' to 'start+duration' seconds (default [start = 0])\n";
+	fseek(fout, 0, SEEK_END);
+	fwrite(info.data(), sizeof(char), info.size(), fout);
+}
+
+Thread muteConverter::convert(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+
+	std::string threadFile;
+	unsigned int time_begin = 0;
+	unsigned int duration;
+
 	threadFile = threadFiles[0];
 	if (parameters.size() == 2) {
 		time_begin = parameters[0];
@@ -39,18 +52,7 @@ muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<u
 	else {
 		throw std::invalid_argument("Extra arguments for muting");
 	}
-}
 
-void muteConverter::whatAreYouDoing(FILE* fout) {
-	std::string info;
-	info += "\t\tmuteConverter\n";
-	info += "command: mute [start] [duration]\n";
-	info += "muting of stream from [start] to [start+duration] seconds\n";
-	fseek(fout, 0, SEEK_END);
-	fwrite(info.data(), sizeof(char), info.size(), fout);
-}
-
-Thread muteConverter::convert() {
 
 	Thread thread(std::make_shared<std::string>(threadFile));
 	inputThread inputThread1(threadFile, thread);

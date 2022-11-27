@@ -14,17 +14,28 @@
 extern AbstractFactory<Converter, std::string> ConverterFactory;
 
 namespace {
-	Converter* createMixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-		return new mixConverter(threadFiles, parameters, outputFile);
+	Converter* createMixConverter() {
+		return new mixConverter();
 	}
 
 	const bool registered = ConverterFactory.Register("mix", createMixConverter);
 }
 
-mixConverter::mixConverter(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-	this->outputFile = outputFile;
-	threadFile1 = threadFiles[0];
+void mixConverter::whatAreYouDoing(FILE* fout) {
+	std::string info;
+	info += "mixConverter\n";
+	info += "\tcommand: mix second thread [start]\n";
+	info += "\tmixing of the main and second streams starting from 'start' second (default [start = 0])\n";
+	fseek(fout, 0, SEEK_END);
+	fwrite(info.data(), sizeof(char), info.size(), fout);
+}
 
+Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+	std::string threadFile1;
+	std::string threadFile2;
+	unsigned int time_begin = 0;
+	threadFile1 = threadFiles[0];
+	
 	if (threadFiles.size() == 2) {
 		threadFile2 = threadFiles[1];
 	}
@@ -34,25 +45,13 @@ mixConverter::mixConverter(std::vector<std::string> threadFiles, std::vector<uns
 	else {
 		throw std::invalid_argument("Extra arguments for mixing");
 	}
-
+	
 	if (!parameters.empty()) {
 		time_begin = parameters[0];
 	}
 	else {
 		time_begin = 0;
 	}
-}
-
-void mixConverter::whatAreYouDoing(FILE* fout) {
-	std::string info;
-	info += "\t\tmixConverter\n";
-	info += "command: mix [second thread] [start]\n";
-	info += "mixing of the main and second streams starting from [start] second (default start = 0)\n";
-	fseek(fout, 0, SEEK_END);
-	fwrite(info.data(), sizeof(char), info.size(), fout);
-}
-
-Thread mixConverter::convert() {
 
 
 	Thread thread1(std::make_shared<std::string>(threadFile1));
@@ -75,6 +74,7 @@ Thread mixConverter::convert() {
 
 
 	size_t data_size = thread1.getNumberOfSamples();
+
 	size_t begin = time_begin * thread1.getHeader().get_sample_rate();
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time");

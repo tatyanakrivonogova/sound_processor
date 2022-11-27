@@ -72,8 +72,6 @@ void readConfig::read(std::vector<std::vector<std::string> >& config) {
 			for (std::vector<std::string>::iterator it = command.begin(); it < command.end(); ++it) {
 				if ((*it).front() == '$') {
 					int thread_number = getThreadNumber(*it);
-					/*command.insert(it, inputFiles[thread_number - 1]);
-					command.erase(it);*/
 					*it = inputFiles[thread_number - 1];
 				}
 			}

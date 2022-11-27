@@ -70,14 +70,16 @@ void CmdArgumentHandler::getCmdArgs(int argc, char** argv, std::string& configFi
 		}
 	}
 
-	if (outputFile.empty()) {
-		throw std::invalid_argument("No output file");
-	}
-	if (configFile.empty()) {
-		throw std::invalid_argument("No config file");
-	}
-	if (inputFiles.empty()) {
-		throw std::invalid_argument("No input file");
+	if (help == false) {
+		if (outputFile.empty()) {
+			throw std::invalid_argument("No output file");
+		}
+		if (configFile.empty()) {
+			throw std::invalid_argument("No config file");
+		}
+		if (inputFiles.empty()) {
+			throw std::invalid_argument("No input file");
+		}
 	}
 
 }
