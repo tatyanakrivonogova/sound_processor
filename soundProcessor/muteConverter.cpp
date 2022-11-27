@@ -27,7 +27,7 @@ muteConverter::muteConverter(std::vector<std::string> threadFiles, std::vector<u
 	threadFile = threadFiles[0];
 	if (parameters.size() == 2) {
 		time_begin = parameters[0];
-		duration = parameters[1]; 
+		duration = parameters[1];
 	}
 	else if (parameters.size() == 1) {
 		time_begin = 0;

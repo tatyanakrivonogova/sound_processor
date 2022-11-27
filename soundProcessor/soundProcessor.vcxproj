@@ -170,6 +170,7 @@
     <ClInclude Include="readBuffer.h" />
     <ClInclude Include="readConfig.h" />
     <ClInclude Include="slowConverter.h" />
+    <ClInclude Include="soundProcessor.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="WAVheader.h" />
     <ClInclude Include="writeBuffer.h" />
