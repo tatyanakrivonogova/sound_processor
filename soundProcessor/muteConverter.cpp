@@ -47,7 +47,7 @@ Thread muteConverter::convert(std::vector<std::string> threadFiles, std::vector<
 		duration = parameters[0];
 	}
 	else if (parameters.size() == 0) {
-		throw std::runtime_error("Expected muting duration");
+		throw std::runtime_error("Expected muting duration for muting");
 	}
 	else {
 		throw std::invalid_argument("Extra arguments for muting");
@@ -66,7 +66,7 @@ Thread muteConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	FILE* fin;
 	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
 	if (!fin) {
-		throw std::runtime_error("Unavailable input file");
+		throw std::runtime_error("Unavailable input file for muting");
 	}
 
 	readBuffer readBuff(BUFF_SIZE, fin, thread.getData());
@@ -84,7 +84,7 @@ Thread muteConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
 	if (!fout) {
-		throw std::runtime_error("Unavailable output file");
+		throw std::runtime_error("Unavailable output file for muting");
 	}
 
 	outputHeader outputHeader(fout, newThread.getHeader());
@@ -101,15 +101,15 @@ Thread muteConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
 	size_t begin = time_begin * thread.getHeader().get_sample_rate();
 	if (begin > data_size) {
-		throw std::runtime_error("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time for muting");
 	}
 
 	size_t end = (time_begin + duration) * thread.getHeader().get_sample_rate();
 	if (end > data_size) {
-		throw std::runtime_error("Unavailable argument of duration");
+		throw std::runtime_error("Unavailable argument of duration for muting");
 	}
 	if (begin > end) {
-		throw std::runtime_error("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time for muting");
 	}
 
 	//before begin

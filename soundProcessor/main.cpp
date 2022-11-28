@@ -56,7 +56,13 @@ int main(int argc, char** argv) {
 	}
 	std::vector<std::vector<std::string> > config;
 	readConfig readConfig(configFile, inputFiles);
-	readConfig.read(config);
+	try {
+		readConfig.read(config);
+	}
+	catch (std::runtime_error const& ex) {
+		std::cerr << ex.what() << '\n';
+		return -1;
+	}
 
 	Thread thread(std::make_shared<std::string>(inputFiles[0]));
 

@@ -72,7 +72,7 @@ Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	FILE* fin;
 	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
 	if (!fin) {
-		throw std::runtime_error("Unavailable input file");
+		throw std::runtime_error("Unavailable input file for slowing");
 	}
 
 	readBuffer readBuff(BUFF_SIZE, fin, thread.getData());
@@ -91,7 +91,7 @@ Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
 	if (!fout) {
-		throw std::runtime_error("Unavailable output file");
+		throw std::runtime_error("Unavailable output file for slowing");
 	}
 
 	newThread.getHeader().get_subchunk3_size() = ratio * newThread.getHeader().get_subchunk3_size();
@@ -109,15 +109,15 @@ Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
 	size_t begin = time_begin * thread.getHeader().get_sample_rate();
 	if (begin > data_size) {
-		throw std::runtime_error("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time for slowing");
 	}
 
 	size_t end = (time_begin + duration) * thread.getHeader().get_sample_rate();
 	if (end > data_size) {
-		throw std::runtime_error("Unavailable argument of duration");
+		throw std::runtime_error("Unavailable argument of duration for slowing");
 	}
 	if (begin > end) {
-		throw std::runtime_error("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time for slowing");
 	}
 
 	//before begin

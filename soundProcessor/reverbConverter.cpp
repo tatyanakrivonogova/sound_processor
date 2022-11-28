@@ -72,7 +72,7 @@ Thread reverbConverter::convert(std::vector<std::string> threadFiles, std::vecto
 	FILE* fin;
 	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
 	if (!fin) {
-		throw std::runtime_error("Unavailable input file");
+		throw std::runtime_error("Unavailable input file for reverbing");
 	}
 
 	readBuffer readBuff(BUFF_SIZE, fin, thread.getData());
@@ -80,7 +80,7 @@ Thread reverbConverter::convert(std::vector<std::string> threadFiles, std::vecto
 
 	Thread newThread(thread);
 	if (outputFile == nullptr) {
-		std::string newFile = "muted_" + (*thread.getFile());
+		std::string newFile = "reverbed_" + (*thread.getFile());
 		newThread.setFile(std::make_shared<std::string>(newFile));
 	}
 	else {
@@ -90,7 +90,7 @@ Thread reverbConverter::convert(std::vector<std::string> threadFiles, std::vecto
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
 	if (!fout) {
-		throw std::runtime_error("Unavailable output file");
+		throw std::runtime_error("Unavailable output file for reverbing");
 	}
 
 	outputHeader outputHeader(fout, newThread.getHeader());
@@ -107,18 +107,18 @@ Thread reverbConverter::convert(std::vector<std::string> threadFiles, std::vecto
 	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
 	size_t begin = time_begin * thread.getHeader().get_sample_rate();
 	if (begin > data_size) {
-		throw std::runtime_error("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
 	}
 
 	size_t end = (time_begin + duration) * thread.getHeader().get_sample_rate();
 	if (end > data_size) {
-		throw std::runtime_error("Unavailable argument of duration");
+		throw std::runtime_error("Unavailable argument of duration for reverbing");
 	}
 	if (begin > end) {
-		throw std::runtime_error("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
 	}
 	if (delay > data_size) {
-		throw std::runtime_error("Unavailable argument of delay");
+		throw std::runtime_error("Unavailable argument of delay for reverbing");
 	}
 
 	//before begin

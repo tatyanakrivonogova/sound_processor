@@ -40,7 +40,7 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 		threadFile2 = threadFiles[1];
 	}
 	else if (threadFiles.size() < 2) {
-		throw std::runtime_error("Expected second input file");
+		throw std::runtime_error("Expected second input file for mixing");
 	}
 	else {
 		throw std::invalid_argument("Extra arguments for mixing");
@@ -77,25 +77,25 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 
 	size_t begin = time_begin * thread1.getHeader().get_sample_rate();
 	if (begin > data_size) {
-		throw std::runtime_error("Unavailable argument of begin_time");
+		throw std::runtime_error("Unavailable argument of begin_time for mixing");
 	}
 	size_t end = (thread1.getNumberOfSamples() - begin <= thread2.getNumberOfSamples())
 		? thread1.getNumberOfSamples() : begin + thread2.getNumberOfSamples();
 	if (end > data_size) {
-		throw std::runtime_error("Unavailable argument of duration");
+		throw std::runtime_error("Unavailable argument of duration for mixing");
 	}
 
 
 	FILE* fin1;
 	fopen_s(&fin1, (*thread1.getFile()).c_str(), "rb");
 	if (!fin1) {
-		throw std::runtime_error("Unavailable input file");
+		throw std::runtime_error("Unavailable input file for mixing");
 	}
 
 	FILE* fin2;
 	fopen_s(&fin2, (*thread2.getFile()).c_str(), "rb");
 	if (!fin2) {
-		throw std::runtime_error("Unavailable input file");
+		throw std::runtime_error("Unavailable input file for mixing");
 	}
 
 
@@ -119,7 +119,7 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 	FILE* fout;
 	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
 	if (!fout) {
-		throw std::runtime_error("Unavailable output file");
+		throw std::runtime_error("Unavailable output file for mixing");
 	}
 
 	outputHeader outputHeader(fout, newThread.getHeader());
@@ -139,7 +139,7 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 	}
 
 	//changing
-	for (size_t i1 = begin, i2 = 0; i1 < (end-begin)/2; ++i1, ++i2) {
+	for (size_t i1 = begin, i2 = 0; i1 < end; ++i1, ++i2) {
 
 		if (static_cast<int>(readBuff1[i1] + readBuff2[i2]) > SHRT_MAX) {
 			writeBuff >> SHRT_MAX;
