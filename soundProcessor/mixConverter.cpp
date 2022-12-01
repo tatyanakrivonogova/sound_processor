@@ -30,10 +30,10 @@ void mixConverter::whatAreYouDoing(FILE* fout) {
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<double> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
 	std::string streamFile1;
 	std::string streamFile2;
-	unsigned int time_begin = 0;
+	double time_begin = 0;
 	streamFile1 = streamFiles[0];
 	
 	if (streamFiles.size() == 2) {
@@ -75,7 +75,7 @@ Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<u
 
 	size_t data_size = stream1.getNumberOfSamples();
 
-	size_t begin = time_begin * stream1.getHeader().get_sample_rate();
+	size_t begin = static_cast<size_t>(time_begin * stream1.getHeader().get_sample_rate());
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time for mixing");
 	}

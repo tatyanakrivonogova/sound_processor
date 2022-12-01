@@ -31,11 +31,11 @@ void muteConverter::whatAreYouDoing(FILE* fout) {
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<double> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
 
 	std::string streamFile;
-	unsigned int time_begin = 0;
-	unsigned int duration;
+	double time_begin = 0;
+	double duration;
 
 	streamFile = streamFiles[0];
 	if (parameters.size() == 2) {
@@ -99,12 +99,12 @@ Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<
 	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
 	
 	size_t data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
-	size_t begin = time_begin * stream.getHeader().get_sample_rate();
+	size_t begin = static_cast<size_t>(time_begin * stream.getHeader().get_sample_rate());
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time for muting");
 	}
 
-	size_t end = (time_begin + duration) * stream.getHeader().get_sample_rate();
+	size_t end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
 	if (end > data_size) {
 		throw std::runtime_error("Unavailable argument of duration for muting");
 	}

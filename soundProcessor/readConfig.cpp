@@ -19,10 +19,10 @@ bool isDigit(char c) {
 size_t getStreamNumber(std::string arg) {
 	std::string number;
 	size_t pos = 0;
-	while (!isDigit(arg[pos])) {
+	while (pos < arg.length() and !isDigit(arg[pos])) {
 		++pos;
 	}
-	while (isDigit(arg[pos])) {
+	while (pos < arg.length() and isDigit(arg[pos])) {
 		number += arg[pos];
 		++pos;
 	}
@@ -71,7 +71,7 @@ void readConfig::read(std::vector<std::vector<std::string> >& config) {
 
 			for (std::vector<std::string>::iterator it = command.begin(); it < command.end(); ++it) {
 				if ((*it).front() == '$') {
-					int stream_number = getStreamNumber(*it);
+					size_t stream_number = getStreamNumber(*it);
 					if (stream_number > inputFiles.size()) {
 						throw std::runtime_error("Wrong reference to stream");
 					}

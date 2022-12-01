@@ -31,12 +31,12 @@ void reverbConverter::whatAreYouDoing(FILE* fout) {
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vector<double> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
 
 	std::string streamFile;
-	unsigned int time_begin = 0;
-	unsigned int duration;
-	unsigned int delay;
+	double time_begin = 0;
+	double duration;
+	double delay;
 	double intensity;
 
 	streamFile = streamFiles[0];
@@ -105,12 +105,12 @@ Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vecto
 	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
 
 	size_t data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
-	size_t begin = time_begin * stream.getHeader().get_sample_rate();
+	size_t begin = static_cast<size_t>(time_begin * stream.getHeader().get_sample_rate());
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
 	}
 
-	size_t end = (time_begin + duration) * stream.getHeader().get_sample_rate();
+	size_t end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
 	if (end > data_size) {
 		throw std::runtime_error("Unavailable argument of duration for reverbing");
 	}
@@ -129,9 +129,12 @@ Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vecto
 	//changing
 	delay *= newStream.getHeader().get_sample_rate();
 	for (size_t i = begin; i < end; ++i) {
-		int sample = (i > delay) ? (static_cast<int>(readBuff[i]) + static_cast<int>(short(intensity*readBuff[i - delay]))) : static_cast<int>(readBuff[i]);
+		int sample = (i > delay) ? (static_cast<int>(readBuff[i]) + static_cast<int>(short(intensity*readBuff[i - static_cast<size_t>(delay)]))) : static_cast<int>(readBuff[i]);
 		if (sample > SHRT_MAX) {
 			writeBuff >> SHRT_MAX;
+		}
+		else if (sample < SHRT_MIN) {
+			writeBuff >> SHRT_MIN;
 		}
 		else {
 			writeBuff >> static_cast<short>(sample);

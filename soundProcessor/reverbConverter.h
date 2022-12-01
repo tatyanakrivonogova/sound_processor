@@ -12,7 +12,7 @@ public:
 	reverbConverter() = default;
 	~reverbConverter() = default;
 
-	Stream convert(std::vector<std::string>, std::vector<unsigned int>, std::shared_ptr<std::string>) override;
+	Stream convert(std::vector<std::string>, std::vector<double>, std::shared_ptr<std::string>) override;
 	void whatAreYouDoing(FILE*) override;
 };
 

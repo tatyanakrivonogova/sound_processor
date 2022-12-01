@@ -27,6 +27,32 @@ size_t getNumberOfStreams(std::vector<std::string> command) {
 	}
 	return count;
 }
+//
+//bool isDigit(char c) {
+//	return c >= '0' and c <= '9';
+//}
+
+//bool isInt(const std::string& str) {
+//	size_t pos = 0;
+//	while (pos < str.length() and isDigit(str[pos])) {
+//		++pos;
+//	}
+//	if (pos == std::string::npos) {
+//		return false;
+//	}
+//	return true;
+//}
+
+//bool isDouble(const std::string& str) {
+//	size_t pos = 0;
+//	while (pos < str.length() and (isDigit(str[pos]) or str[pos] == '.')) {
+//		++pos;
+//	}
+//	if (pos == std::string::npos) {
+//		return false;
+//	}
+//	return true;
+//}
 
 
 int main(int argc, char** argv) {
@@ -75,10 +101,10 @@ int main(int argc, char** argv) {
 			streams.push_back(config[i][j]);
 		}
 
-		std::vector<unsigned int> parameters;
+		std::vector<double> parameters;
 		for (size_t j = streams_number+1; j < config[i].size(); ++j) { // miss name of converter and input streams
 			try {
-				parameters.push_back(stoi(config[i][j]));
+				parameters.push_back(atof(config[i][j].c_str()));
 			}
 			catch (std::invalid_argument const& ex) {
 				std::cerr << ex.what() << '\n';
@@ -89,7 +115,6 @@ int main(int argc, char** argv) {
 		std::shared_ptr<Converter> current_converter = std::shared_ptr<Converter>(ConverterFactory.CreateObject(config[i][0]));
 		
 		try {
-			
 			if (i == config.size() - 1) {
 				stream = current_converter->convert(streams, parameters, std::make_shared<std::string>(outputFile));
 			}
