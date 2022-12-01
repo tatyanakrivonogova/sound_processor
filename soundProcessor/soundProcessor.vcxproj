@@ -143,17 +143,17 @@
     <ClCompile Include="CmdArgumentHandler.cpp" />
     <ClCompile Include="Converter.cpp" />
     <ClCompile Include="Help.cpp" />
-    <ClCompile Include="inputThread.cpp" />
+    <ClCompile Include="inputStream.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mixConverter.cpp" />
     <ClCompile Include="muteConverter.cpp" />
     <ClCompile Include="outputHeader.cpp" />
-    <ClCompile Include="outputThread.cpp" />
+    <ClCompile Include="outputStream.cpp" />
     <ClCompile Include="readBuffer.cpp" />
     <ClCompile Include="readConfig.cpp" />
     <ClCompile Include="reverbConverter.cpp" />
     <ClCompile Include="slowConverter.cpp" />
-    <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="Stream.cpp" />
     <ClCompile Include="WAVheader.cpp" />
     <ClCompile Include="writeBuffer.cpp" />
   </ItemGroup>
@@ -163,17 +163,17 @@
     <ClInclude Include="Converter.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="Help.h" />
-    <ClInclude Include="inputThread.h" />
+    <ClInclude Include="inputStream.h" />
     <ClInclude Include="mixConverter.h" />
     <ClInclude Include="muteConverter.h" />
     <ClInclude Include="outputHeader.h" />
-    <ClInclude Include="outputThread.h" />
+    <ClInclude Include="outputStream.h" />
     <ClInclude Include="readBuffer.h" />
     <ClInclude Include="readConfig.h" />
     <ClInclude Include="reverbConverter.h" />
     <ClInclude Include="slowConverter.h" />
     <ClInclude Include="soundProcessor.h" />
-    <ClInclude Include="Thread.h" />
+    <ClInclude Include="Stream.h" />
     <ClInclude Include="WAVheader.h" />
     <ClInclude Include="writeBuffer.h" />
   </ItemGroup>

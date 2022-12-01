@@ -8,9 +8,9 @@
 #include "dsound.h"
 #include "Factory.h"
 #include "WAVheader.h"
-#include "Thread.h"
-#include "inputThread.h"
-#include "outputThread.h"
+#include "Stream.h"
+#include "inputStream.h"
+#include "outputStream.h"
 #include "muteConverter.h"
 #include "readConfig.h"
 #include "CmdArgumentHandler.h"
@@ -18,7 +18,7 @@
 
 AbstractFactory<Converter, std::string> ConverterFactory;
 
-size_t getNumberOfThreads(std::vector<std::string> command) {
+size_t getNumberOfStreams(std::vector<std::string> command) {
 	size_t current_arg = 1; // miss name of converter
 	size_t count = 0;
 	while (current_arg < command.size() and command[current_arg].find(".wav") != std::string::npos) {
@@ -64,19 +64,19 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	Thread thread(std::make_shared<std::string>(inputFiles[0]));
+	Stream stream(std::make_shared<std::string>(inputFiles[0]));
 
 	for (size_t i = 0; i < config.size(); ++i) {
 
-		size_t threads_number = getNumberOfThreads(config[i]);
-		std::vector<std::string> threads;
-		threads.push_back(*thread.getFile());
-		for (size_t j = 1; j < threads_number+1; ++j) { //miss name of converter
-			threads.push_back(config[i][j]);
+		size_t streams_number = getNumberOfStreams(config[i]);
+		std::vector<std::string> streams;
+		streams.push_back(*stream.getFile());
+		for (size_t j = 1; j < streams_number+1; ++j) { //miss name of converter
+			streams.push_back(config[i][j]);
 		}
 
 		std::vector<unsigned int> parameters;
-		for (size_t j = threads_number+1; j < config[i].size(); ++j) { // miss name of converter and input threads
+		for (size_t j = streams_number+1; j < config[i].size(); ++j) { // miss name of converter and input streams
 			try {
 				parameters.push_back(stoi(config[i][j]));
 			}
@@ -91,10 +91,10 @@ int main(int argc, char** argv) {
 		try {
 			
 			if (i == config.size() - 1) {
-				thread = current_converter->convert(threads, parameters, std::make_shared<std::string>(outputFile));
+				stream = current_converter->convert(streams, parameters, std::make_shared<std::string>(outputFile));
 			}
 			else {
-				thread = current_converter->convert(threads, parameters);
+				stream = current_converter->convert(streams, parameters);
 			}
 		}
 		catch (std::runtime_error const& ex) {

@@ -4,18 +4,18 @@
 #include <vector>
 #include <string>
 
-class Thread
+class Stream
 {
 public:
-	Thread(WAVheader header, unsigned int data = 0, unsigned int number_of_samples = 0, std::shared_ptr<std::string> file = nullptr) : header(header), data(data) {}
-	Thread(std::shared_ptr<std::string> file = nullptr) : file(file) {}
-	~Thread() {}
+	Stream(WAVheader header, unsigned int data = 0, unsigned int number_of_samples = 0, std::shared_ptr<std::string> file = nullptr) : header(header), data(data) {}
+	Stream(std::shared_ptr<std::string> file = nullptr) : file(file) {}
+	~Stream() {}
 
-	Thread(const Thread&);
-	Thread(Thread&&) noexcept;
+	Stream(const Stream&);
+	Stream(Stream&&) noexcept;
 
-	Thread& operator=(const Thread&);
-	Thread& operator=(Thread&&) noexcept;
+	Stream& operator=(const Stream&);
+	Stream& operator=(Stream&&) noexcept;
 
 	WAVheader& getHeader();
 	const unsigned int getData();

@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "Converter.h"
-#include "Thread.h"
+#include "Stream.h"
 
 class muteConverter : public Converter
 {
@@ -12,7 +12,7 @@ public:
 	muteConverter() = default;
 	~muteConverter() = default;
 
-	Thread convert(std::vector<std::string>, std::vector<unsigned int>, std::shared_ptr<std::string>) override;
+	Stream convert(std::vector<std::string>, std::vector<unsigned int>, std::shared_ptr<std::string>) override;
 	void whatAreYouDoing(FILE*) override;
 };
 

@@ -1,5 +1,5 @@
 mixConverter
-	command: mix second thread [start]
+	command: mix second stream [start]
 	mixing of the main and second streams starting from 'start' second (default [start = 0])
 muteConverter
 	command: mute [start] duration

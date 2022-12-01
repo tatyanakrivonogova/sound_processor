@@ -42,109 +42,109 @@ char* WAVheader::get_subchunk3_ID() {
     return subchunk3_ID;
 }
 
-WAVheader::WAVheader(const WAVheader& otherThread) : chunk_size(otherThread.chunk_size), subchunk1_size(otherThread.subchunk1_size),
-audio_format(otherThread.audio_format), num_channels(otherThread.num_channels), sample_rate(otherThread.sample_rate),
-byte_rate(otherThread.byte_rate), block_align(otherThread.block_align), bits_per_sample(otherThread.bits_per_sample),
-subchunk3_size(otherThread.subchunk3_size) {
+WAVheader::WAVheader(const WAVheader& otherStream) : chunk_size(otherStream.chunk_size), subchunk1_size(otherStream.subchunk1_size),
+audio_format(otherStream.audio_format), num_channels(otherStream.num_channels), sample_rate(otherStream.sample_rate),
+byte_rate(otherStream.byte_rate), block_align(otherStream.block_align), bits_per_sample(otherStream.bits_per_sample),
+subchunk3_size(otherStream.subchunk3_size) {
     for (int i = 0; i < 4; ++i) {
-        chunk_ID[i] = otherThread.chunk_ID[i];
+        chunk_ID[i] = otherStream.chunk_ID[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        format[i] = otherThread.format[i];
+        format[i] = otherStream.format[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        subchunk1_ID[i] = otherThread.subchunk1_ID[i];
+        subchunk1_ID[i] = otherStream.subchunk1_ID[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        subchunk3_ID[i] = otherThread.subchunk3_ID[i];
-    }
-}
-
-WAVheader::WAVheader(WAVheader&& otherThread) noexcept : chunk_size(otherThread.chunk_size), subchunk1_size(otherThread.subchunk1_size),
-audio_format(otherThread.audio_format), num_channels(otherThread.num_channels), sample_rate(otherThread.sample_rate),
-byte_rate(otherThread.byte_rate), block_align(otherThread.block_align), bits_per_sample(otherThread.bits_per_sample),
-subchunk3_size(otherThread.subchunk3_size) {
-    for (int i = 0; i < 4; ++i) {
-        chunk_ID[i] = otherThread.chunk_ID[i];
-    }
-
-    for (int i = 0; i < 4; ++i) {
-        format[i] = otherThread.format[i];
-    }
-
-    for (int i = 0; i < 4; ++i) {
-        subchunk1_ID[i] = otherThread.subchunk1_ID[i];
-    }
-
-    for (int i = 0; i < 4; ++i) {
-        subchunk3_ID[i] = otherThread.subchunk3_ID[i];
+        subchunk3_ID[i] = otherStream.subchunk3_ID[i];
     }
 }
 
-WAVheader& WAVheader::operator=(const WAVheader& otherThread) {
-    if (this == &otherThread)
+WAVheader::WAVheader(WAVheader&& otherStream) noexcept : chunk_size(otherStream.chunk_size), subchunk1_size(otherStream.subchunk1_size),
+audio_format(otherStream.audio_format), num_channels(otherStream.num_channels), sample_rate(otherStream.sample_rate),
+byte_rate(otherStream.byte_rate), block_align(otherStream.block_align), bits_per_sample(otherStream.bits_per_sample),
+subchunk3_size(otherStream.subchunk3_size) {
+    for (int i = 0; i < 4; ++i) {
+        chunk_ID[i] = otherStream.chunk_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        format[i] = otherStream.format[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk1_ID[i] = otherStream.subchunk1_ID[i];
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        subchunk3_ID[i] = otherStream.subchunk3_ID[i];
+    }
+}
+
+WAVheader& WAVheader::operator=(const WAVheader& otherStream) {
+    if (this == &otherStream)
         return *this;
 
-    chunk_size = otherThread.chunk_size;
-    subchunk1_size = otherThread.subchunk1_size;
-    audio_format = otherThread.audio_format;
-    num_channels = otherThread.num_channels;
-    sample_rate = otherThread.sample_rate;
-    byte_rate = otherThread.byte_rate;
-    block_align = otherThread.block_align;
-    bits_per_sample = otherThread.bits_per_sample;
-    subchunk3_size = otherThread.subchunk3_size;
+    chunk_size = otherStream.chunk_size;
+    subchunk1_size = otherStream.subchunk1_size;
+    audio_format = otherStream.audio_format;
+    num_channels = otherStream.num_channels;
+    sample_rate = otherStream.sample_rate;
+    byte_rate = otherStream.byte_rate;
+    block_align = otherStream.block_align;
+    bits_per_sample = otherStream.bits_per_sample;
+    subchunk3_size = otherStream.subchunk3_size;
 
     for (int i = 0; i < 4; ++i) {
-        chunk_ID[i] = otherThread.chunk_ID[i];
+        chunk_ID[i] = otherStream.chunk_ID[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        format[i] = otherThread.format[i];
+        format[i] = otherStream.format[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        subchunk1_ID[i] = otherThread.subchunk1_ID[i];
+        subchunk1_ID[i] = otherStream.subchunk1_ID[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        subchunk3_ID[i] = otherThread.subchunk3_ID[i];
+        subchunk3_ID[i] = otherStream.subchunk3_ID[i];
     }
 
     return *this;
 }
 
-WAVheader& WAVheader::operator=(WAVheader&& otherThread) noexcept {
-    if (this == &otherThread)
+WAVheader& WAVheader::operator=(WAVheader&& otherStream) noexcept {
+    if (this == &otherStream)
         return *this;
 
-    chunk_size = otherThread.chunk_size;
-    subchunk1_size = otherThread.subchunk1_size;
-    audio_format = otherThread.audio_format;
-    num_channels = otherThread.num_channels;
-    sample_rate = otherThread.sample_rate;
-    byte_rate = otherThread.byte_rate;
-    block_align = otherThread.block_align;
-    bits_per_sample = otherThread.bits_per_sample;
-    subchunk3_size = otherThread.subchunk3_size;
+    chunk_size = otherStream.chunk_size;
+    subchunk1_size = otherStream.subchunk1_size;
+    audio_format = otherStream.audio_format;
+    num_channels = otherStream.num_channels;
+    sample_rate = otherStream.sample_rate;
+    byte_rate = otherStream.byte_rate;
+    block_align = otherStream.block_align;
+    bits_per_sample = otherStream.bits_per_sample;
+    subchunk3_size = otherStream.subchunk3_size;
 
     for (int i = 0; i < 4; ++i) {
-        chunk_ID[i] = otherThread.chunk_ID[i];
+        chunk_ID[i] = otherStream.chunk_ID[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        format[i] = otherThread.format[i];
+        format[i] = otherStream.format[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        subchunk1_ID[i] = otherThread.subchunk1_ID[i];
+        subchunk1_ID[i] = otherStream.subchunk1_ID[i];
     }
 
     for (int i = 0; i < 4; ++i) {
-        subchunk3_ID[i] = otherThread.subchunk3_ID[i];
+        subchunk3_ID[i] = otherStream.subchunk3_ID[i];
     }
 
     return *this;

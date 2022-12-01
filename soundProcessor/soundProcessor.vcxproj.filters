@@ -18,16 +18,16 @@
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="inputThread.cpp">
+    <ClCompile Include="inputStream.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="WAVheader.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Thread.cpp">
+    <ClCompile Include="Stream.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="outputThread.cpp">
+    <ClCompile Include="outputStream.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Converter.cpp">
@@ -68,16 +68,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inputThread.h">
+    <ClInclude Include="inputStream.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="WAVheader.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Thread.h">
+    <ClInclude Include="Stream.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="outputThread.h">
+    <ClInclude Include="outputStream.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Factory.h">

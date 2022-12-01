@@ -2,7 +2,7 @@
 #include <vector>
 #include <cstdio>
 #include "Converter.h"
-#include "Thread.h"
+#include "Stream.h"
 
 class mixConverter : public Converter
 {
@@ -12,7 +12,7 @@ public:
 	mixConverter() = default;
 	~mixConverter() = default;
 
-	Thread convert(std::vector<std::string>, std::vector<unsigned int>, std::shared_ptr<std::string>) override;
+	Stream convert(std::vector<std::string>, std::vector<unsigned int>, std::shared_ptr<std::string>) override;
 	void whatAreYouDoing(FILE*) override;
 };
 

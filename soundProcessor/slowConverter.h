@@ -1,6 +1,6 @@
 #pragma once
 #include "Converter.h"
-#include "Thread.h"
+#include "Stream.h"
 
 class slowConverter : public Converter
 {
@@ -10,7 +10,7 @@ public:
 	slowConverter() = default;
 	~slowConverter() = default;
 
-	Thread convert(std::vector<std::string>, std::vector<unsigned int>, std::shared_ptr<std::string>) override;
+	Stream convert(std::vector<std::string>, std::vector<unsigned int>, std::shared_ptr<std::string>) override;
 	void whatAreYouDoing(FILE*) override;
 };
 

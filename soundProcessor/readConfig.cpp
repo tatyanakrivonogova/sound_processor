@@ -16,7 +16,7 @@ bool isDigit(char c) {
 	return c >= '0' and c <= '9';
 }
 
-size_t getThreadNumber(std::string arg) {
+size_t getStreamNumber(std::string arg) {
 	std::string number;
 	size_t pos = 0;
 	while (!isDigit(arg[pos])) {
@@ -71,11 +71,11 @@ void readConfig::read(std::vector<std::vector<std::string> >& config) {
 
 			for (std::vector<std::string>::iterator it = command.begin(); it < command.end(); ++it) {
 				if ((*it).front() == '$') {
-					int thread_number = getThreadNumber(*it);
-					if (thread_number > inputFiles.size()) {
-						throw std::runtime_error("Wrong reference to thread");
+					int stream_number = getStreamNumber(*it);
+					if (stream_number > inputFiles.size()) {
+						throw std::runtime_error("Wrong reference to stream");
 					}
-					*it = inputFiles[thread_number - 1];
+					*it = inputFiles[stream_number - 1];
 				}
 			}
 			config.push_back(command);

@@ -2,11 +2,11 @@
 #include "mixConverter.h"
 #include "Converter.h"
 #include "Factory.h"
-#include "Thread.h"
+#include "Stream.h"
 #include "readBuffer.h"
 #include "writeBuffer.h"
 #include "outputHeader.h"
-#include "inputThread.h"
+#include "inputStream.h"
 #include <fstream>
 #include <iostream>
 #define BUFF_SIZE 1000
@@ -24,22 +24,22 @@ namespace {
 void mixConverter::whatAreYouDoing(FILE* fout) {
 	std::string info;
 	info += "mixConverter\n";
-	info += "\tcommand: mix second thread [start]\n";
+	info += "\tcommand: mix second stream [start]\n";
 	info += "\tmixing of the main and second streams starting from 'start' second (default [start = 0])\n";
 	fseek(fout, 0, SEEK_END);
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-	std::string threadFile1;
-	std::string threadFile2;
+Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+	std::string streamFile1;
+	std::string streamFile2;
 	unsigned int time_begin = 0;
-	threadFile1 = threadFiles[0];
+	streamFile1 = streamFiles[0];
 	
-	if (threadFiles.size() == 2) {
-		threadFile2 = threadFiles[1];
+	if (streamFiles.size() == 2) {
+		streamFile2 = streamFiles[1];
 	}
-	else if (threadFiles.size() < 2) {
+	else if (streamFiles.size() < 2) {
 		throw std::runtime_error("Expected second input file for mixing");
 	}
 	else {
@@ -54,75 +54,75 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 	}
 
 
-	Thread thread1(std::make_shared<std::string>(threadFile1));
-	inputThread inputThread1(threadFile1, thread1);
+	Stream stream1(std::make_shared<std::string>(streamFile1));
+	inputStream inputStream1(streamFile1, stream1);
 	try {
-		inputThread1.input();
+		inputStream1.input();
 	}
 	catch (std::runtime_error const& ex) {
 		throw ex;
 	}
 
-	Thread thread2(std::make_shared<std::string>(threadFile2));
-	inputThread inputThread2(threadFile2, thread2);
+	Stream stream2(std::make_shared<std::string>(streamFile2));
+	inputStream inputStream2(streamFile2, stream2);
 	try {
-		inputThread2.input();
+		inputStream2.input();
 	}
 	catch (std::runtime_error const& ex) {
 		throw ex;
 	}
 
 
-	size_t data_size = thread1.getNumberOfSamples();
+	size_t data_size = stream1.getNumberOfSamples();
 
-	size_t begin = time_begin * thread1.getHeader().get_sample_rate();
+	size_t begin = time_begin * stream1.getHeader().get_sample_rate();
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time for mixing");
 	}
-	size_t end = (thread1.getNumberOfSamples() - begin <= thread2.getNumberOfSamples())
-		? thread1.getNumberOfSamples() : begin + thread2.getNumberOfSamples();
+	size_t end = (stream1.getNumberOfSamples() - begin <= stream2.getNumberOfSamples())
+		? stream1.getNumberOfSamples() : begin + stream2.getNumberOfSamples();
 	if (end > data_size) {
 		throw std::runtime_error("Unavailable argument of duration for mixing");
 	}
 
 
 	FILE* fin1;
-	fopen_s(&fin1, (*thread1.getFile()).c_str(), "rb");
+	fopen_s(&fin1, (*stream1.getFile()).c_str(), "rb");
 	if (!fin1) {
 		throw std::runtime_error("Unavailable input file for mixing");
 	}
 
 	FILE* fin2;
-	fopen_s(&fin2, (*thread2.getFile()).c_str(), "rb");
+	fopen_s(&fin2, (*stream2.getFile()).c_str(), "rb");
 	if (!fin2) {
 		throw std::runtime_error("Unavailable input file for mixing");
 	}
 
 
-	readBuffer readBuff1(BUFF_SIZE, fin1, thread1.getData());
-	readBuffer readBuff2(BUFF_SIZE, fin2, thread2.getData());
+	readBuffer readBuff1(BUFF_SIZE, fin1, stream1.getData());
+	readBuffer readBuff2(BUFF_SIZE, fin2, stream2.getData());
 
 
-	Thread newThread;
+	Stream newStream;
 	if (outputFile == nullptr) {
-		std::string newFile = "mixed_" + (*thread1.getFile()) + '_' + (*thread2.getFile());
-		newThread.setFile(std::make_shared<std::string>(newFile));
+		std::string newFile = "mixed_" + (*stream1.getFile()) + '_' + (*stream2.getFile());
+		newStream.setFile(std::make_shared<std::string>(newFile));
 	}
 	else {
-		newThread.setFile(outputFile);
+		newStream.setFile(outputFile);
 	}
 	
-	newThread.setHeader(thread1.getHeader());
-	newThread.setData(thread1.getData());
+	newStream.setHeader(stream1.getHeader());
+	newStream.setData(stream1.getData());
 
 
 	FILE* fout;
-	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
+	fopen_s(&fout, (*newStream.getFile()).c_str(), "wb");
 	if (!fout) {
 		throw std::runtime_error("Unavailable output file for mixing");
 	}
 
-	outputHeader outputHeader(fout, newThread.getHeader());
+	outputHeader outputHeader(fout, newStream.getHeader());
 	try {
 		outputHeader.output();
 	}
@@ -130,7 +130,7 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 		throw ex;
 	}
 
-	writeBuffer writeBuff(BUFF_SIZE, fout, newThread.getData());
+	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
 
 
 	//before begin
@@ -160,5 +160,5 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 	fclose(fin1);
 	fclose(fin2);
 	fclose(fout);
-	return newThread;
+	return newStream;
 }

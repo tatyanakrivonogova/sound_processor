@@ -2,11 +2,11 @@
 #include "slowConverter.h"
 #include "Converter.h"
 #include "Factory.h"
-#include "Thread.h"
+#include "Stream.h"
 #include "readBuffer.h"
 #include "writeBuffer.h"
 #include "outputHeader.h"
-#include "inputThread.h"
+#include "inputStream.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -32,13 +32,13 @@ void slowConverter::whatAreYouDoing(FILE* fout) {
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+Stream slowConverter::convert(std::vector<std::string> streamFiles, std::vector<unsigned int> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
 
 	unsigned int time_begin = 0;
 	unsigned int duration;
 	unsigned int ratio;
 
-	std::string threadFile = threadFiles[0];
+	std::string streamFile = streamFiles[0];
 	if (parameters.size() == 3) {
 		time_begin = parameters[0];
 		duration = parameters[1];
@@ -60,42 +60,42 @@ Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	}
 
 
-	Thread thread(std::make_shared<std::string>(threadFile));
-	inputThread inputThread1(threadFile, thread);
+	Stream stream(std::make_shared<std::string>(streamFile));
+	inputStream inputStream1(streamFile, stream);
 	try {
-		inputThread1.input();
+		inputStream1.input();
 	}
 	catch (std::runtime_error const& ex) {
 		throw ex;
 	}
 
 	FILE* fin;
-	fopen_s(&fin, (*thread.getFile()).c_str(), "rb");
+	fopen_s(&fin, (*stream.getFile()).c_str(), "rb");
 	if (!fin) {
 		throw std::runtime_error("Unavailable input file for slowing");
 	}
 
-	readBuffer readBuff(BUFF_SIZE, fin, thread.getData());
+	readBuffer readBuff(BUFF_SIZE, fin, stream.getData());
 
 
-	Thread newThread(thread);
+	Stream newStream(stream);
 	if (outputFile == nullptr) {
-		std::string newFile = "slowed_" + (*thread.getFile());
-		newThread.setFile(std::make_shared<std::string>(newFile));
+		std::string newFile = "slowed_" + (*stream.getFile());
+		newStream.setFile(std::make_shared<std::string>(newFile));
 	}
 	else {
-		newThread.setFile(outputFile);
+		newStream.setFile(outputFile);
 	}
 
 
 	FILE* fout;
-	fopen_s(&fout, (*newThread.getFile()).c_str(), "wb");
+	fopen_s(&fout, (*newStream.getFile()).c_str(), "wb");
 	if (!fout) {
 		throw std::runtime_error("Unavailable output file for slowing");
 	}
 
-	newThread.getHeader().get_subchunk3_size() = ratio * newThread.getHeader().get_subchunk3_size();
-	outputHeader outputHeader(fout, newThread.getHeader());
+	newStream.getHeader().get_subchunk3_size() = ratio * newStream.getHeader().get_subchunk3_size();
+	outputHeader outputHeader(fout, newStream.getHeader());
 	try {
 		outputHeader.output();
 	}
@@ -104,15 +104,15 @@ Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<
 	}
 
 
-	writeBuffer writeBuff(BUFF_SIZE, fout, newThread.getData());
+	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
 
-	size_t data_size = (thread.getHeader().get_chunk_size() - thread.getData()) / 2;
-	size_t begin = time_begin * thread.getHeader().get_sample_rate();
+	size_t data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
+	size_t begin = time_begin * stream.getHeader().get_sample_rate();
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time for slowing");
 	}
 
-	size_t end = (time_begin + duration) * thread.getHeader().get_sample_rate();
+	size_t end = (time_begin + duration) * stream.getHeader().get_sample_rate();
 	if (end > data_size) {
 		throw std::runtime_error("Unavailable argument of duration for slowing");
 	}
@@ -139,5 +139,5 @@ Thread slowConverter::convert(std::vector<std::string> threadFiles, std::vector<
 
 	fclose(fin);
 	fclose(fout);
-	return newThread;
+	return newStream;
 }
