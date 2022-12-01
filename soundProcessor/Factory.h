@@ -21,14 +21,8 @@ public:
         if (it == map_.end()) {
             throw std::runtime_error("Undefined ID of converter");
         }
-        try {
+        else {
             return (it->second)();
-        }
-        catch (std::invalid_argument const& ex) {
-            throw ex;
-        }
-        catch (std::runtime_error const& ex) {
-            throw ex;
         }
     }
 

@@ -141,8 +141,11 @@ Thread mixConverter::convert(std::vector<std::string> threadFiles, std::vector<u
 	//changing
 	for (size_t i1 = begin, i2 = 0; i1 < end; ++i1, ++i2) {
 
-		if (static_cast<int>(readBuff1[i1] + readBuff2[i2]) > SHRT_MAX) {
+		if (static_cast<int>(readBuff1[i1]) + static_cast<int>(readBuff2[i2]) > SHRT_MAX) {
 			writeBuff >> SHRT_MAX;
+		}
+		else if (static_cast<int>(readBuff1[i1]) + static_cast<int>(readBuff2[i2]) < SHRT_MIN) {
+			writeBuff >> SHRT_MIN;
 		}
 		else {
 			writeBuff >> readBuff1[i1] + readBuff2[i2];

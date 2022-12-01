@@ -129,7 +129,7 @@ Thread reverbConverter::convert(std::vector<std::string> threadFiles, std::vecto
 	//changing
 	delay *= newThread.getHeader().get_sample_rate();
 	for (size_t i = begin; i < end; ++i) {
-		int sample = (i > delay) ? static_cast<int>(readBuff[i] + short(intensity*readBuff[i - delay])) : static_cast<int>(readBuff[i]);
+		int sample = (i > delay) ? (static_cast<int>(readBuff[i]) + static_cast<int>(short(intensity*readBuff[i - delay]))) : static_cast<int>(readBuff[i]);
 		if (sample > SHRT_MAX) {
 			writeBuff >> SHRT_MAX;
 		}
