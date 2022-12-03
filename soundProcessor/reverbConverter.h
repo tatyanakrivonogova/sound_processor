@@ -17,6 +17,6 @@ public:
 	void whatAreYouDoing(FILE*) override;
 	void setArgs(std::vector<std::string>&, std::vector<double>&, std::string&, double&, double&, double&, double&);
 	void checkArgs(Stream&, size_t&, size_t&, size_t&, double&, double&, double&, double&);
-	void prepareStreams(std::shared_ptr<std::string>, std::string&, Stream&, Stream&);
+	void prepareStreams(std::shared_ptr<std::string>, std::string&, Stream&, Stream&, double&);
 };
 

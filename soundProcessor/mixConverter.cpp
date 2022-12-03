@@ -150,7 +150,8 @@ Stream mixConverter::convert(std::vector<std::string>& streamFiles, std::vector<
 	}
 
 	//changing
-	sumStreams(readBuff1, readBuff2, writeBuff, begin, 0, end);
+	sumStreams(readBuff1, readBuff2, writeBuff, stream1.getHeader().get_subchunk3_size(),
+		stream2.getHeader().get_subchunk3_size(), begin, 0, end);
 
 	//after end
 	for (size_t i = end; i < data_size; ++i) {

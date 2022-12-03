@@ -79,7 +79,7 @@ void reverbConverter::checkArgs(Stream& stream, size_t& data_size, size_t& begin
 }
 
 void reverbConverter::prepareStreams(std::shared_ptr<std::string> outputFile, 
-	std::string& streamFile, Stream& stream, Stream& newStream) {
+	std::string& streamFile, Stream& stream, Stream& newStream, double& delay) {
 	inputStream inputStream1(streamFile, stream);
 	try {
 		inputStream1.input();
@@ -107,7 +107,9 @@ void reverbConverter::prepareStreams(std::shared_ptr<std::string> outputFile,
 		throw std::runtime_error("Unavailable output file for reverbing");
 	}
 
+	newStream.getHeader().get_subchunk3_size() = static_cast<size_t>(delay + newStream.getHeader().get_subchunk3_size());
 	outputHeader outputHeader(fout, newStream.getHeader());
+
 	try {
 		outputHeader.output();
 	}
@@ -127,7 +129,7 @@ Stream reverbConverter::convert(std::vector<std::string>& streamFiles, std::vect
 	Stream stream(std::make_shared<std::string>(streamFile));
 	Stream newStream;
 
-	prepareStreams(outputFile, streamFile, stream, newStream);
+	prepareStreams(outputFile, streamFile, stream, newStream, delay);
 	checkArgs(stream, data_size, begin, end, time_begin, duration, delay, intensity);
 
 
@@ -141,7 +143,9 @@ Stream reverbConverter::convert(std::vector<std::string>& streamFiles, std::vect
 
 	//changing
 	delay *= newStream.getHeader().get_sample_rate();
-	sumStreams(readBuff, readBuff, writeBuff, static_cast<size_t>(begin+delay), begin, end, 1.0, intensity);
+	end += static_cast<size_t>(delay);
+	sumStreams(readBuff, readBuff, writeBuff, stream.getHeader().get_subchunk3_size(), 
+		newStream.getHeader().get_subchunk3_size(), static_cast<size_t>(begin+delay), begin, end, 1.0, intensity);
 
 	//after end
 	for (size_t i = end; i < data_size; ++i) {
