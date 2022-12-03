@@ -27,32 +27,6 @@ size_t getNumberOfStreams(std::vector<std::string> command) {
 	}
 	return count;
 }
-//
-//bool isDigit(char c) {
-//	return c >= '0' and c <= '9';
-//}
-
-//bool isInt(const std::string& str) {
-//	size_t pos = 0;
-//	while (pos < str.length() and isDigit(str[pos])) {
-//		++pos;
-//	}
-//	if (pos == std::string::npos) {
-//		return false;
-//	}
-//	return true;
-//}
-
-//bool isDouble(const std::string& str) {
-//	size_t pos = 0;
-//	while (pos < str.length() and (isDigit(str[pos]) or str[pos] == '.')) {
-//		++pos;
-//	}
-//	if (pos == std::string::npos) {
-//		return false;
-//	}
-//	return true;
-//}
 
 
 int main(int argc, char** argv) {

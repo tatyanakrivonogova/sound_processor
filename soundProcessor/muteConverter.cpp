@@ -31,11 +31,8 @@ void muteConverter::whatAreYouDoing(FILE* fout) {
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<double> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-
-	std::string streamFile;
-	double time_begin = 0;
-	double duration;
+void muteConverter::setArgs(std::vector<std::string>& streamFiles, std::vector<double>& parameters,
+	std::string& streamFile, double& time_begin, double& duration) {
 
 	streamFile = streamFiles[0];
 	if (parameters.size() == 2) {
@@ -52,9 +49,29 @@ Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<
 	else {
 		throw std::invalid_argument("Extra arguments for muting");
 	}
+}
 
+void muteConverter::checkArgs(Stream& stream, size_t& data_size, size_t& begin, size_t& end,
+	double& time_begin, double& duration) {
 
-	Stream stream(std::make_shared<std::string>(streamFile));
+	data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
+	begin = static_cast<size_t>(time_begin * stream.getHeader().get_sample_rate());
+	if (begin > data_size) {
+		throw std::runtime_error("Unavailable argument of begin_time for muting");
+	}
+
+	end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
+	if (end > data_size) {
+		throw std::runtime_error("Unavailable argument of duration for muting");
+	}
+	if (begin > end) {
+		throw std::runtime_error("Unavailable argument of begin_time for muting");
+	}
+
+}
+
+void muteConverter::prepareStreams(std::shared_ptr<std::string> outputFile,
+	std::string& streamFile, Stream& stream, Stream& newStream) {
 	inputStream inputStream1(streamFile, stream);
 	try {
 		inputStream1.input();
@@ -63,16 +80,12 @@ Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<
 		throw ex;
 	}
 
-	FILE* fin;
 	fopen_s(&fin, (*stream.getFile()).c_str(), "rb");
 	if (!fin) {
 		throw std::runtime_error("Unavailable input file for muting");
 	}
 
-	readBuffer readBuff(BUFF_SIZE, fin, stream.getData());
-
-
-	Stream newStream(stream);
+	newStream = stream;
 	if (outputFile == nullptr) {
 		std::string newFile = "muted_" + (*stream.getFile());
 		newStream.setFile(std::make_shared<std::string>(newFile));
@@ -81,7 +94,6 @@ Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<
 		newStream.setFile(outputFile);
 	}
 
-	FILE* fout;
 	fopen_s(&fout, (*newStream.getFile()).c_str(), "wb");
 	if (!fout) {
 		throw std::runtime_error("Unavailable output file for muting");
@@ -94,23 +106,24 @@ Stream muteConverter::convert(std::vector<std::string> streamFiles, std::vector<
 	catch (std::runtime_error const& ex) {
 		throw ex;
 	}
+}
 
+Stream muteConverter::convert(std::vector<std::string>& streamFiles, std::vector<double>& parameters, std::shared_ptr<std::string> outputFile = nullptr) {
 
-	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
+	std::string streamFile;
+	double time_begin = 0, duration;
+	size_t data_size, begin, end;
+
+	setArgs(streamFiles, parameters, streamFile, time_begin, duration);
+	Stream stream(std::make_shared<std::string>(streamFile));
+	Stream newStream;
+
+	prepareStreams(outputFile, streamFile, stream, newStream);
+	checkArgs(stream, data_size, begin, end, time_begin, duration);
+
 	
-	size_t data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
-	size_t begin = static_cast<size_t>(time_begin * stream.getHeader().get_sample_rate());
-	if (begin > data_size) {
-		throw std::runtime_error("Unavailable argument of begin_time for muting");
-	}
-
-	size_t end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
-	if (end > data_size) {
-		throw std::runtime_error("Unavailable argument of duration for muting");
-	}
-	if (begin > end) {
-		throw std::runtime_error("Unavailable argument of begin_time for muting");
-	}
+	readBuffer readBuff(BUFF_SIZE, fin, stream.getData());
+	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
 
 	//before begin
 	for (size_t i = 0; i < begin; ++i) {

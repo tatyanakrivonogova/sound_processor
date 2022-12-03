@@ -7,6 +7,7 @@
 #include "writeBuffer.h"
 #include "outputHeader.h"
 #include "inputStream.h"
+#include "sumStreams.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -31,13 +32,8 @@ void reverbConverter::whatAreYouDoing(FILE* fout) {
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vector<double> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-
-	std::string streamFile;
-	double time_begin = 0;
-	double duration;
-	double delay;
-	double intensity;
+void reverbConverter::setArgs(std::vector<std::string>& streamFiles, std::vector<double>& parameters, 
+	std::string& streamFile, double& time_begin, double& duration, double& delay, double& intensity) {
 
 	streamFile = streamFiles[0];
 	if (parameters.size() == 4) {
@@ -58,9 +54,32 @@ Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vecto
 	else {
 		throw std::invalid_argument("Extra arguments for reverbing");
 	}
+}
 
+void reverbConverter::checkArgs(Stream& stream, size_t& data_size, size_t& begin, size_t& end, 
+	double& time_begin, double& duration, double& delay, double& intensity) {
 
-	Stream stream(std::make_shared<std::string>(streamFile));
+	data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
+	begin = static_cast<size_t>(time_begin * stream.getHeader().get_sample_rate());
+	if (begin > data_size) {
+		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
+	}
+
+	end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
+	if (end > data_size) {
+		throw std::runtime_error("Unavailable argument of duration for reverbing");
+	}
+	if (begin > end) {
+		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
+	}
+	if (delay > data_size) {
+		throw std::runtime_error("Unavailable argument of delay for reverbing");
+	}
+
+}
+
+void reverbConverter::prepareStreams(std::shared_ptr<std::string> outputFile, 
+	std::string& streamFile, Stream& stream, Stream& newStream) {
 	inputStream inputStream1(streamFile, stream);
 	try {
 		inputStream1.input();
@@ -68,17 +87,13 @@ Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vecto
 	catch (std::runtime_error const& ex) {
 		throw ex;
 	}
+	newStream = stream;
 
-	FILE* fin;
 	fopen_s(&fin, (*stream.getFile()).c_str(), "rb");
 	if (!fin) {
 		throw std::runtime_error("Unavailable input file for reverbing");
 	}
 
-	readBuffer readBuff(BUFF_SIZE, fin, stream.getData());
-
-
-	Stream newStream(stream);
 	if (outputFile == nullptr) {
 		std::string newFile = "reverbed_" + (*stream.getFile());
 		newStream.setFile(std::make_shared<std::string>(newFile));
@@ -87,7 +102,6 @@ Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vecto
 		newStream.setFile(outputFile);
 	}
 
-	FILE* fout;
 	fopen_s(&fout, (*newStream.getFile()).c_str(), "wb");
 	if (!fout) {
 		throw std::runtime_error("Unavailable output file for reverbing");
@@ -100,26 +114,25 @@ Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vecto
 	catch (std::runtime_error const& ex) {
 		throw ex;
 	}
+}
+
+Stream reverbConverter::convert(std::vector<std::string>& streamFiles, std::vector<double>& parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+
+	std::string streamFile;
+	double time_begin = 0, duration, delay, intensity;
+
+	size_t data_size, begin, end;
+
+	setArgs(streamFiles, parameters, streamFile, time_begin, duration, delay, intensity);
+	Stream stream(std::make_shared<std::string>(streamFile));
+	Stream newStream;
+
+	prepareStreams(outputFile, streamFile, stream, newStream);
+	checkArgs(stream, data_size, begin, end, time_begin, duration, delay, intensity);
 
 
+	readBuffer readBuff(BUFF_SIZE, fin, stream.getData());
 	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
-
-	size_t data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
-	size_t begin = static_cast<size_t>(time_begin * stream.getHeader().get_sample_rate());
-	if (begin > data_size) {
-		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
-	}
-
-	size_t end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
-	if (end > data_size) {
-		throw std::runtime_error("Unavailable argument of duration for reverbing");
-	}
-	if (begin > end) {
-		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
-	}
-	if (delay > data_size) {
-		throw std::runtime_error("Unavailable argument of delay for reverbing");
-	}
 
 	//before begin
 	for (size_t i = 0; i < begin; ++i) {
@@ -128,18 +141,7 @@ Stream reverbConverter::convert(std::vector<std::string> streamFiles, std::vecto
 
 	//changing
 	delay *= newStream.getHeader().get_sample_rate();
-	for (size_t i = begin; i < end; ++i) {
-		int sample = (i > delay) ? (static_cast<int>(readBuff[i]) + static_cast<int>(short(intensity*readBuff[i - static_cast<size_t>(delay)]))) : static_cast<int>(readBuff[i]);
-		if (sample > SHRT_MAX) {
-			writeBuff >> SHRT_MAX;
-		}
-		else if (sample < SHRT_MIN) {
-			writeBuff >> SHRT_MIN;
-		}
-		else {
-			writeBuff >> static_cast<short>(sample);
-		}
-	}
+	sumStreams(readBuff, readBuff, writeBuff, static_cast<size_t>(begin+delay), begin, end, 1.0, intensity);
 
 	//after end
 	for (size_t i = end; i < data_size; ++i) {

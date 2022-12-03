@@ -7,6 +7,7 @@
 #include "writeBuffer.h"
 #include "outputHeader.h"
 #include "inputStream.h"
+#include "sumStreams.h"
 #include <fstream>
 #include <iostream>
 #define BUFF_SIZE 1000
@@ -30,12 +31,11 @@ void mixConverter::whatAreYouDoing(FILE* fout) {
 	fwrite(info.data(), sizeof(char), info.size(), fout);
 }
 
-Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<double> parameters, std::shared_ptr<std::string> outputFile = nullptr) {
-	std::string streamFile1;
-	std::string streamFile2;
-	double time_begin = 0;
+void mixConverter::setArgs(std::vector<std::string>& streamFiles, std::vector<double>& parameters,
+	std::string& streamFile1, std::string& streamFile2, double& time_begin) {
+
 	streamFile1 = streamFiles[0];
-	
+
 	if (streamFiles.size() == 2) {
 		streamFile2 = streamFiles[1];
 	}
@@ -45,16 +45,33 @@ Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<d
 	else {
 		throw std::invalid_argument("Extra arguments for mixing");
 	}
-	
+
 	if (!parameters.empty()) {
 		time_begin = parameters[0];
 	}
 	else {
 		time_begin = 0;
 	}
+}
 
+void mixConverter::checkArgs(Stream& stream1, Stream& stream2, size_t& data_size, size_t& begin, size_t& end,
+	double& time_begin) {
 
-	Stream stream1(std::make_shared<std::string>(streamFile1));
+	data_size = stream1.getNumberOfSamples();
+
+	begin = static_cast<size_t>(time_begin * stream1.getHeader().get_sample_rate());
+	if (begin > data_size) {
+		throw std::runtime_error("Unavailable argument of begin_time for mixing");
+	}
+	end = (stream1.getNumberOfSamples() - begin <= stream2.getNumberOfSamples())
+		? stream1.getNumberOfSamples() : begin + stream2.getNumberOfSamples();
+	if (end > data_size) {
+		throw std::runtime_error("Unavailable argument of duration for mixing");
+	}
+}
+
+void mixConverter::prepareStreams(std::shared_ptr<std::string> outputFile,
+	std::string& streamFile1, std::string& streamFile2, Stream& stream1, Stream& stream2, Stream& newStream) {
 	inputStream inputStream1(streamFile1, stream1);
 	try {
 		inputStream1.input();
@@ -63,7 +80,6 @@ Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<d
 		throw ex;
 	}
 
-	Stream stream2(std::make_shared<std::string>(streamFile2));
 	inputStream inputStream2(streamFile2, stream2);
 	try {
 		inputStream2.input();
@@ -72,38 +88,16 @@ Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<d
 		throw ex;
 	}
 
-
-	size_t data_size = stream1.getNumberOfSamples();
-
-	size_t begin = static_cast<size_t>(time_begin * stream1.getHeader().get_sample_rate());
-	if (begin > data_size) {
-		throw std::runtime_error("Unavailable argument of begin_time for mixing");
-	}
-	size_t end = (stream1.getNumberOfSamples() - begin <= stream2.getNumberOfSamples())
-		? stream1.getNumberOfSamples() : begin + stream2.getNumberOfSamples();
-	if (end > data_size) {
-		throw std::runtime_error("Unavailable argument of duration for mixing");
-	}
-
-
-	FILE* fin1;
 	fopen_s(&fin1, (*stream1.getFile()).c_str(), "rb");
 	if (!fin1) {
 		throw std::runtime_error("Unavailable input file for mixing");
 	}
 
-	FILE* fin2;
 	fopen_s(&fin2, (*stream2.getFile()).c_str(), "rb");
 	if (!fin2) {
 		throw std::runtime_error("Unavailable input file for mixing");
 	}
 
-
-	readBuffer readBuff1(BUFF_SIZE, fin1, stream1.getData());
-	readBuffer readBuff2(BUFF_SIZE, fin2, stream2.getData());
-
-
-	Stream newStream;
 	if (outputFile == nullptr) {
 		std::string newFile = "mixed_" + (*stream1.getFile()) + '_' + (*stream2.getFile());
 		newStream.setFile(std::make_shared<std::string>(newFile));
@@ -111,12 +105,10 @@ Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<d
 	else {
 		newStream.setFile(outputFile);
 	}
-	
+
 	newStream.setHeader(stream1.getHeader());
 	newStream.setData(stream1.getData());
 
-
-	FILE* fout;
 	fopen_s(&fout, (*newStream.getFile()).c_str(), "wb");
 	if (!fout) {
 		throw std::runtime_error("Unavailable output file for mixing");
@@ -129,7 +121,26 @@ Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<d
 	catch (std::runtime_error const& ex) {
 		throw ex;
 	}
+}
 
+Stream mixConverter::convert(std::vector<std::string>& streamFiles, std::vector<double>& parameters, std::shared_ptr<std::string> outputFile = nullptr) {
+	
+	std::string streamFile1;
+	std::string streamFile2;
+	double time_begin = 0;
+
+	size_t data_size, begin, end;
+
+	setArgs(streamFiles, parameters, streamFile1, streamFile2, time_begin);
+	Stream stream1(std::make_shared<std::string>(streamFile1));
+	Stream stream2(std::make_shared<std::string>(streamFile2));
+	Stream newStream;
+
+	prepareStreams(outputFile, streamFile1, streamFile2, stream1, stream2, newStream);
+	checkArgs(stream1, stream2, data_size, begin, end, time_begin);
+
+	readBuffer readBuff1(BUFF_SIZE, fin1, stream1.getData());
+	readBuffer readBuff2(BUFF_SIZE, fin2, stream2.getData());
 	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
 
 
@@ -139,18 +150,7 @@ Stream mixConverter::convert(std::vector<std::string> streamFiles, std::vector<d
 	}
 
 	//changing
-	for (size_t i1 = begin, i2 = 0; i1 < end; ++i1, ++i2) {
-
-		if (static_cast<int>(readBuff1[i1]) + static_cast<int>(readBuff2[i2]) > SHRT_MAX) {
-			writeBuff >> SHRT_MAX;
-		}
-		else if (static_cast<int>(readBuff1[i1]) + static_cast<int>(readBuff2[i2]) < SHRT_MIN) {
-			writeBuff >> SHRT_MIN;
-		}
-		else {
-			writeBuff >> readBuff1[i1] + readBuff2[i2];
-		}
-	}
+	sumStreams(readBuff1, readBuff2, writeBuff, begin, 0, end);
 
 	//after end
 	for (size_t i = end; i < data_size; ++i) {
