@@ -61,11 +61,13 @@ void reverbConverter::checkArgs(Stream& stream, size_t& data_size, size_t& begin
 
 	data_size = (stream.getHeader().get_chunk_size() - stream.getData()) / 2;
 	begin = static_cast<size_t>(time_begin * stream.getHeader().get_sample_rate());
+	end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
+	delay = static_cast<size_t>((delay) * stream.getHeader().get_sample_rate());
 	if (begin > data_size) {
 		throw std::runtime_error("Unavailable argument of begin_time for reverbing");
 	}
 
-	end = static_cast<size_t>((time_begin + duration) * stream.getHeader().get_sample_rate());
+
 	if (end > data_size) {
 		throw std::runtime_error("Unavailable argument of duration for reverbing");
 	}
@@ -137,15 +139,15 @@ Stream reverbConverter::convert(std::vector<std::string>& streamFiles, std::vect
 	writeBuffer writeBuff(BUFF_SIZE, fout, newStream.getData());
 
 	//before begin
-	for (size_t i = 0; i < begin; ++i) {
+	for (size_t i = 0; i < begin+delay; ++i) {
 		writeBuff >> readBuff[i];
 	}
 
 	//changing
-	delay *= newStream.getHeader().get_sample_rate();
-	end += static_cast<size_t>(delay);
+	//delay *= newStream.getHeader().get_sample_rate();
+	//end += static_cast<size_t>(delay);
 	sumStreams(readBuff, readBuff, writeBuff, stream.getHeader().get_subchunk3_size(), 
-		newStream.getHeader().get_subchunk3_size(), static_cast<size_t>(begin+delay), begin, end, 1.0, intensity);
+		newStream.getHeader().get_subchunk3_size(), static_cast<size_t>(begin+delay), begin, static_cast<size_t>(end + delay), 1.0, intensity);
 
 	//after end
 	for (size_t i = end; i < data_size; ++i) {
